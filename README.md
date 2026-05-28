@@ -2,6 +2,8 @@
 
 A visual retrospective of the global shift in AI — from generative sequence prediction to stateful autonomous agents, modular hardware, sovereign local networks, and economic restructuring.
 
+> **Note:** This codebase is not intended to be human-readable; it is optimized for generating and serving the static experience.
+
 ## Pages
 
 | File | Description |
