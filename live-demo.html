@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Live LLM Demo · 100% In-Browser · For Developers</title>
+
+  <meta name="description" content="A real frontier-class small LLM running entirely in your browser via WebGPU. Five demos for software developers: streaming chat, reasoning effort, persona/system prompts, tool calling, and multi-agent orchestration. No API keys, no servers, works offline.">
+  <meta name="robots" content="noindex">
+
+  <link rel="stylesheet" href="styles.css">
+
+  <script>
+    (function () {
+      try {
+        var stored = localStorage.getItem('ai-report-theme');
+        var prefers = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+        var theme = stored || (prefers ? 'dark' : 'light');
+        document.documentElement.setAttribute('data-theme', theme);
+      } catch (e) {
+        document.documentElement.setAttribute('data-theme', 'light');
+      }
+    })();
+  </script>
+</head>
+<body class="present-body live-body">
+
+  <main class="present-main live-main">
+
+    <!-- Top bar -->
+    <div class="present-topbar">
+      <a class="present-back" href="index.html">
+        <span aria-hidden="true">←</span> Back to Report
+      </a>
+      <div class="present-topbar-right">
+        <a class="present-demo-cta talk-link" href="talk.html">
+          <span aria-hidden="true">📋</span> Talking Points
+        </a>
+        <div class="theme-toggle" role="group" aria-label="Color theme">
+          <button class="theme-toggle-btn" data-theme-set="light" aria-label="Light theme">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <circle cx="12" cy="12" r="4"/>
+              <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/>
+            </svg>
+            Light
+          </button>
+          <button class="theme-toggle-btn" data-theme-set="dark" aria-label="Dark theme">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+            </svg>
+            Dark
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Sovereign banner -->
+    <aside class="sovereign-banner" id="sovereign-banner">
+      <div class="sovereign-banner-icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24" width="22" height="22">
+          <path d="M12 2 4 6v6c0 5 3.5 9.4 8 10 4.5-.6 8-5 8-10V6l-8-4z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/>
+          <path d="M9 12l2 2 4-4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+      <div class="sovereign-banner-body">
+        <div class="sovereign-banner-head">
+          <strong>This page runs the LLM 100% on your laptop.</strong>
+          <span class="sovereign-banner-pill" id="net-status-pill">checking network…</span>
+        </div>
+        <p class="sovereign-banner-text">
+          No API keys. No servers. After the first download, the model is cached in your browser and works <em>offline</em>. Try it: open DevTools → Network → set to <strong>Offline</strong> → run any demo. Welcome to the open-weight era.
+        </p>
+      </div>
+      <button class="sovereign-banner-test" id="net-test-btn" type="button">Test offline ↺</button>
+    </aside>
+
+    <!-- Hero / model picker -->
+    <header class="present-hero live-hero">
+      <div class="present-kicker">Live · in-browser LLM · WebGPU</div>
+      <h1 class="present-title">A real model. Right here. Right now.</h1>
+      <p class="present-subtitle">Five demos for software developers. Same model, five lenses on what's actually new.</p>
+
+      <!-- Model picker + status -->
+      <div class="model-picker" role="region" aria-label="Model selection and status">
+        <div class="model-picker-row">
+          <label class="model-picker-label" for="model-select">Model</label>
+          <select id="model-select" class="model-select"></select>
+          <button class="model-load-btn" id="model-load-btn" type="button">⬇ Load model</button>
+          <button class="model-unload-btn" id="model-unload-btn" type="button" hidden>✕ Unload</button>
+        </div>
+        <div class="model-picker-stats" id="model-status">
+          <span class="model-stat-pill model-stat-engine" id="engine-pill">engine: WebLLM</span>
+          <span class="model-stat-pill" id="webgpu-pill">WebGPU: checking…</span>
+          <span class="model-stat-pill" id="model-pill">no model loaded</span>
+          <span class="model-stat-pill" id="vram-pill">VRAM: —</span>
+        </div>
+        <div class="model-progress" id="model-progress" hidden>
+          <div class="model-progress-bar"><div class="model-progress-fill" id="model-progress-fill"></div></div>
+          <div class="model-progress-text" id="model-progress-text">Initialising…</div>
+        </div>
+        <div class="model-picker-hint" id="model-hint">
+          Tip: pick the smallest model on weak Wi-Fi (Qwen 0.5B downloads in ~30 s). Llama 3.2 3B is the best quality at this size but is ~1.8 GB on first load. Once loaded, the model is cached forever.
+        </div>
+        <details class="model-source-note">
+          <summary>Where do model files come from? · 💾 local · 📦 cache · 🌐 internet</summary>
+          <p>Loading order: <strong>1)</strong> local folder <code>./models/&lt;model-id&gt;/</code> if present, <strong>2)</strong> browser Cache API (already-downloaded weights), <strong>3)</strong> HuggingFace CDN. The progress text above tells you which path the loader took.</p>
+          <p>To pre-download into the local folder (works fully offline, no browser cache dependency):</p>
+          <pre><code>./download-models.sh                         # default: Llama-3.2-1B + Qwen3-0.6B
+./download-models.sh all                     # all 7 models
+./download-models.sh Qwen3-1.7B-q4f16_1-MLC  # specific id
+
+# Then serve over http (file:// blocks fetch in Chrome):
+python3 -m http.server 8000
+# Open: http://localhost:8000/live-demo.html</code></pre>
+        </details>
+      </div>
+    </header>
+
+    <!-- Tabs -->
+    <nav class="live-tabs" role="tablist" id="live-tabs">
+      <button class="live-tab active" data-tab="chat" role="tab" aria-selected="true">
+        <span class="live-tab-icon" aria-hidden="true">💬</span>
+        <span class="live-tab-label">1 · Streaming Chat</span>
+        <span class="live-tab-sub">first-token latency · tok/s</span>
+      </button>
+      <button class="live-tab" data-tab="reasoning" role="tab" aria-selected="false">
+        <span class="live-tab-icon" aria-hidden="true">🧠</span>
+        <span class="live-tab-label">2 · Reasoning Knob</span>
+        <span class="live-tab-sub">low / med / high effort</span>
+      </button>
+      <button class="live-tab" data-tab="persona" role="tab" aria-selected="false">
+        <span class="live-tab-icon" aria-hidden="true">🎭</span>
+        <span class="live-tab-label">3 · Persona</span>
+        <span class="live-tab-sub">same model, different role</span>
+      </button>
+      <button class="live-tab" data-tab="tools" role="tab" aria-selected="false">
+        <span class="live-tab-icon" aria-hidden="true">🛠️</span>
+        <span class="live-tab-label">4 · Tool Calling</span>
+        <span class="live-tab-sub">model emits JSON, browser executes</span>
+      </button>
+      <button class="live-tab" data-tab="orch" role="tab" aria-selected="false">
+        <span class="live-tab-icon" aria-hidden="true">🤖</span>
+        <span class="live-tab-label">5 · Multi-Agent</span>
+        <span class="live-tab-sub">Planner → Researcher → Critic</span>
+      </button>
+      <button class="live-tab" data-tab="evals" role="tab" aria-selected="false">
+        <span class="live-tab-icon" aria-hidden="true">📊</span>
+        <span class="live-tab-label">6 · Evals</span>
+        <span class="live-tab-sub">your own eval, your own data</span>
+      </button>
+    </nav>
+
+    <!-- ───── Demo 1 · Streaming Chat ───── -->
+    <section class="live-panel active" data-panel="chat" role="tabpanel">
+      <div class="live-panel-head">
+        <div class="live-panel-kicker">Beat 03a · Show, don't tell</div>
+        <h2 class="live-panel-title">Streaming chat — first-token latency &amp; tok/s</h2>
+        <p class="live-panel-blurb">A real model, generating one token at a time, on this laptop. Watch first-token latency and tokens/sec. Both are real numbers, not animations.</p>
+      </div>
+
+      <div class="chat-shell">
+        <div class="chat-messages" id="chat-messages" aria-live="polite"></div>
+
+        <div class="chat-stats" id="chat-stats">
+          <span class="chat-stat-pill"><span class="chat-stat-label">first-token</span> <strong id="chat-ttft">—</strong></span>
+          <span class="chat-stat-pill"><span class="chat-stat-label">throughput</span> <strong id="chat-tps">—</strong></span>
+          <span class="chat-stat-pill"><span class="chat-stat-label">tokens out</span> <strong id="chat-tokens">0</strong></span>
+        </div>
+
+        <div class="chat-presets">
+          <button class="chat-preset" data-preset="explain-mcp">Explain MCP in 3 sentences</button>
+          <button class="chat-preset" data-preset="explain-eval">What is an LLM eval?</button>
+          <button class="chat-preset" data-preset="rust-vs-go">Rust vs Go for an HTTP server</button>
+          <button class="chat-preset" data-preset="debug-py">Debug this Python loop</button>
+        </div>
+
+        <form class="chat-input-row" id="chat-form">
+          <textarea
+            id="chat-input"
+            class="chat-input"
+            rows="2"
+            placeholder="Ask anything. ⌘/Ctrl+Enter to send."
+          ></textarea>
+          <button type="submit" class="chat-send" id="chat-send">Send ↵</button>
+          <button type="button" class="chat-stop" id="chat-stop" hidden>■ Stop</button>
+        </form>
+      </div>
+    </section>
+
+    <!-- ───── Demo 2 · Reasoning Knob ───── -->
+    <section class="live-panel" data-panel="reasoning" role="tabpanel">
+      <div class="live-panel-head">
+        <div class="live-panel-kicker">Beat 03b · The cost knob</div>
+        <h2 class="live-panel-title">Reasoning effort — same prompt, three system prompts</h2>
+        <p class="live-panel-blurb">Frontier labs ship a single <code>reasoning_effort</code> knob. Small open models don't have it natively — but you can fake it with system prompts. Same model, three settings. Watch tokens out and time go up; watch quality go up too.</p>
+      </div>
+
+      <div class="reasoning-shell">
+        <div class="reasoning-prompt-card">
+          <div class="reasoning-prompt-label">Test prompt</div>
+          <pre class="reasoning-prompt-code" id="reasoning-prompt-code"></pre>
+        </div>
+
+        <div class="reasoning-levels">
+          <div class="reasoning-level" data-level="low">
+            <div class="reasoning-level-head">
+              <span class="reasoning-level-name">Low effort</span>
+              <span class="reasoning-level-tag">just answer</span>
+            </div>
+            <div class="reasoning-level-stats" id="rstats-low">
+              <span class="r-stat"><strong data-stat="tokens">—</strong> tokens</span>
+              <span class="r-stat"><strong data-stat="time">—</strong> time</span>
+              <span class="r-stat"><strong data-stat="tps">—</strong> tok/s</span>
+            </div>
+            <pre class="reasoning-level-output" id="rout-low"></pre>
+          </div>
+
+          <div class="reasoning-level" data-level="med">
+            <div class="reasoning-level-head">
+              <span class="reasoning-level-name">Medium effort</span>
+              <span class="reasoning-level-tag">think step by step</span>
+            </div>
+            <div class="reasoning-level-stats" id="rstats-med">
+              <span class="r-stat"><strong data-stat="tokens">—</strong> tokens</span>
+              <span class="r-stat"><strong data-stat="time">—</strong> time</span>
+              <span class="r-stat"><strong data-stat="tps">—</strong> tok/s</span>
+            </div>
+            <pre class="reasoning-level-output" id="rout-med"></pre>
+          </div>
+
+          <div class="reasoning-level" data-level="high">
+            <div class="reasoning-level-head">
+              <span class="reasoning-level-name">High effort</span>
+              <span class="reasoning-level-tag">plan, draft, critique, answer</span>
+            </div>
+            <div class="reasoning-level-stats" id="rstats-high">
+              <span class="r-stat"><strong data-stat="tokens">—</strong> tokens</span>
+              <span class="r-stat"><strong data-stat="time">—</strong> time</span>
+              <span class="r-stat"><strong data-stat="tps">—</strong> tok/s</span>
+            </div>
+            <pre class="reasoning-level-output" id="rout-high"></pre>
+          </div>
+        </div>
+
+        <div class="reasoning-actions">
+          <button class="idemo-run" id="reasoning-run" type="button">▶ Run all three</button>
+          <button class="idemo-reset" id="reasoning-reset" type="button">↻ Reset</button>
+          <span class="reasoning-elapsed" id="reasoning-elapsed"></span>
+        </div>
+      </div>
+    </section>
+
+    <!-- ───── Demo 3 · Persona ───── -->
+    <section class="live-panel" data-panel="persona" role="tabpanel">
+      <div class="live-panel-head">
+        <div class="live-panel-kicker">Beat 03c · System prompts shape behaviour</div>
+        <h2 class="live-panel-title">Same model, same prompt — different role</h2>
+        <p class="live-panel-blurb">A reminder to the audience: the model is one weights file. The behaviour they see in production is mostly the system prompt. Pick a persona; type a prompt; same weights answer like a Senior SRE, a Skeptical Reviewer, or a 10-year-old.</p>
+      </div>
+
+      <div class="persona-shell">
+        <div class="persona-row">
+          <div class="persona-buttons" id="persona-buttons" role="tablist"></div>
+          <pre class="persona-system" id="persona-system"></pre>
+        </div>
+
+        <div class="persona-presets" id="persona-presets" role="group" aria-label="Preset prompts"></div>
+
+        <div class="persona-input-row">
+          <textarea id="persona-input" class="chat-input" rows="2" placeholder="Type a prompt to send to all selected personas. Or click a preset above."></textarea>
+          <button type="button" class="chat-send" id="persona-run">Send to all ↵</button>
+          <button type="button" class="chat-stop" id="persona-stop" hidden>■ Stop</button>
+        </div>
+
+        <div class="persona-grid" id="persona-grid"></div>
+      </div>
+    </section>
+
+    <!-- ───── Demo 4 · Tool Calling ───── -->
+    <section class="live-panel" data-panel="tools" role="tabpanel">
+      <div class="live-panel-head">
+        <div class="live-panel-kicker">Beat 03d · The agent loop, real</div>
+        <h2 class="live-panel-title">Tool calling — model emits JSON, browser executes, result fed back</h2>
+        <p class="live-panel-blurb">This is the single most important architectural shift. The model decides: <em>“I need to call <code>calculator</code> with these args.”</em> The browser runs the JS. The result is fed back. The loop continues until the model says <code>done</code>. No API. No backend. Everything in this tab.</p>
+      </div>
+
+      <div class="tools-shell">
+        <div class="tools-toolbox">
+          <div class="tools-toolbox-head">Available tools (handlers below)</div>
+          <div class="tools-toolbox-list" id="tools-toolbox-list"></div>
+        </div>
+
+        <div class="tools-presets">
+          <button class="tools-preset" data-preset="math">A train leaves Boston at 14:30 going 80 mph; another leaves NYC (215 mi away) at 15:00 going 65 mph. When and where do they meet? Use the calculator.</button>
+          <button class="tools-preset" data-preset="time">What is the current time in Tokyo, and how many hours from now until 09:00 Monday Tokyo time? Use get_time.</button>
+          <button class="tools-preset" data-preset="search">Search this report for "MCP" and summarise the top finding. Use search_report.</button>
+        </div>
+
+        <form class="tools-form" id="tools-form">
+          <textarea id="tools-input" class="chat-input" rows="2" placeholder="Ask a question that needs a tool. The model decides which one."></textarea>
+          <button type="submit" class="chat-send" id="tools-send">Run agent loop ↵</button>
+          <button type="button" class="chat-stop" id="tools-stop" hidden>■ Stop</button>
+        </form>
+
+        <div class="tools-trace" id="tools-trace" aria-live="polite">
+          <div class="tools-trace-empty">Pick a preset or type a question to start the loop.</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ───── Demo 5 · Multi-Agent Orchestration ───── -->
+    <section class="live-panel" data-panel="orch" role="tabpanel">
+      <div class="live-panel-head">
+        <div class="live-panel-kicker">Beat 03e · Agents are role-played by system prompts</div>
+        <h2 class="live-panel-title">Multi-agent orchestration — Planner → Researcher → Critic</h2>
+        <p class="live-panel-blurb">One model. Three roles. Sequential calls. Each agent's output is the next agent's input. This is exactly how Claude Code, Devin, Cursor Composer work — minus a thousand engineering details. The architecture is simple; <em>that</em> is the point.</p>
+      </div>
+
+      <div class="orch-shell">
+        <div class="orch-presets">
+          <button class="orch-preset" data-preset="rate-limiter">Design a rate limiter for a public REST API (~10k QPS). What algorithm, what storage, what tradeoffs?</button>
+          <button class="orch-preset" data-preset="oncall">Our on-call dashboard takes 30s to load. What are the top 3 things I should check first?</button>
+          <button class="orch-preset" data-preset="migrate">Should we migrate from Postgres to a vector DB for embeddings? Pros, cons, recommendation.</button>
+        </div>
+
+        <form class="orch-form" id="orch-form">
+          <textarea id="orch-input" class="chat-input" rows="2" placeholder="Pose a non-trivial engineering question. The Planner will break it down."></textarea>
+          <button type="submit" class="chat-send" id="orch-send">▶ Run orchestration</button>
+          <button type="button" class="chat-stop" id="orch-stop" hidden>■ Stop</button>
+        </form>
+
+        <div class="orch-pipeline">
+          <div class="orch-pane" data-agent="planner">
+            <div class="orch-pane-head">
+              <span class="orch-pane-dot orch-dot-planner"></span>
+              <strong>Planner</strong>
+              <span class="orch-pane-role">break the problem into 3 questions</span>
+            </div>
+            <pre class="orch-pane-body" id="orch-out-planner"></pre>
+          </div>
+          <div class="orch-pane" data-agent="researcher">
+            <div class="orch-pane-head">
+              <span class="orch-pane-dot orch-dot-researcher"></span>
+              <strong>Researcher</strong>
+              <span class="orch-pane-role">answer each question concretely</span>
+            </div>
+            <pre class="orch-pane-body" id="orch-out-researcher"></pre>
+          </div>
+          <div class="orch-pane" data-agent="critic">
+            <div class="orch-pane-head">
+              <span class="orch-pane-dot orch-dot-critic"></span>
+              <strong>Critic</strong>
+              <span class="orch-pane-role">find the weakest claim &amp; one missing risk</span>
+            </div>
+            <pre class="orch-pane-body" id="orch-out-critic"></pre>
+          </div>
+          <div class="orch-pane orch-pane-final" data-agent="final">
+            <div class="orch-pane-head">
+              <span class="orch-pane-dot orch-dot-final"></span>
+              <strong>Final answer</strong>
+              <span class="orch-pane-role">Planner re-merges with Critic's notes</span>
+            </div>
+            <pre class="orch-pane-body" id="orch-out-final"></pre>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ───── Demo 6 · Evals ───── -->
+    <section class="live-panel" data-panel="evals" role="tabpanel">
+      <div class="live-panel-head">
+        <div class="live-panel-kicker">Beat 03f · Your own eval, your own data, your own answer</div>
+        <h2 class="live-panel-title">Evals — score multiple models on your own test set</h2>
+        <p class="live-panel-blurb">The closing line of the talk says it: vendor benchmarks are marketing. <em>Your</em> eval is leverage. This tab lets you pick 2-3 models, pick a test set, run all questions sequentially against each model, score with a deterministic check, and compare. Same browser. No API. No spreadsheet. Click <strong>Run eval</strong>.</p>
+      </div>
+
+      <div class="evals-shell">
+        <div class="evals-controls">
+          <fieldset class="evals-fieldset">
+            <legend>Models to evaluate</legend>
+            <div class="evals-models" id="evals-models"></div>
+            <p class="evals-hint">Each selected model loads sequentially. Pre-cache at least one before the talk.</p>
+          </fieldset>
+
+          <fieldset class="evals-fieldset">
+            <legend>Prompt context (system prompt)</legend>
+            <div class="evals-prompts" id="evals-prompts"></div>
+            <p class="evals-hint">This is the <strong>context engineering</strong> axis. Pick 2-3 to prove that prompting can move scores as much as model choice.</p>
+          </fieldset>
+
+          <fieldset class="evals-fieldset">
+            <legend>Test set</legend>
+            <select id="evals-suite" class="evals-select"></select>
+            <p class="evals-hint" id="evals-suite-desc">—</p>
+          </fieldset>
+
+          <div class="evals-actions">
+            <button type="button" id="evals-run" class="chat-send">▶ Run eval</button>
+            <button type="button" id="evals-stop" class="chat-stop" hidden>■ Stop</button>
+            <button type="button" id="evals-reset" class="chat-stop">↺ Reset</button>
+          </div>
+        </div>
+
+        <div class="evals-progress" id="evals-progress" hidden>
+          <div class="evals-progress-text" id="evals-progress-text">Idle</div>
+          <div class="evals-progress-bar"><div class="evals-progress-fill" id="evals-progress-fill"></div></div>
+        </div>
+
+        <div class="evals-scoreboard" id="evals-scoreboard" hidden>
+          <div class="evals-scoreboard-head">Scoreboard</div>
+          <div class="evals-scoreboard-rows" id="evals-scoreboard-rows"></div>
+        </div>
+
+        <div class="evals-trace" id="evals-trace" aria-live="polite">
+          <div class="evals-trace-empty">Pick models + a test set, then hit Run. Per-question results stream in here.</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="present-footer">
+      <a class="playbook-cta-link" href="index.html">← Back to the report</a>
+      <span class="present-footer-divider" aria-hidden="true">·</span>
+      <a class="playbook-cta-link" href="talk.html">Open the Talking Points →</a>
+    </footer>
+
+  </main>
+
+  <!-- WebLLM as ESM via CDN. We pin a recent version known to support
+       Llama 3.2 + Qwen 2.5. The bundle is ~80 KB (model weights are
+       fetched separately when you click "Load model"). -->
+  <script type="module" src="live-demo.js"></script>
+</body>
+</html>

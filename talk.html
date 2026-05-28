@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>20-Minute Talk · What's Changing in AI for Software Developers</title>
+
+  <meta name="description" content="A tight 20-minute talking-points script for delivering an honest, demo-led update on the state of AI for software developers — five inflection points, four disciplines, four reality checks, two-week experiment, Q&A prep.">
+  <meta name="robots" content="noindex">
+
+  <link rel="stylesheet" href="styles.css">
+
+  <script>
+    (function () {
+      try {
+        var stored = localStorage.getItem('ai-report-theme');
+        var prefers = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+        var theme = stored || (prefers ? 'dark' : 'light');
+        document.documentElement.setAttribute('data-theme', theme);
+      } catch (e) {
+        document.documentElement.setAttribute('data-theme', 'light');
+      }
+    })();
+  </script>
+</head>
+<body class="present-body">
+
+  <main class="present-main">
+
+    <!-- Top bar with back link + theme toggle + demo CTA -->
+    <div class="present-topbar">
+      <a class="present-back" href="index.html">
+        <span aria-hidden="true">←</span> Back to Report
+      </a>
+      <div class="present-topbar-right">
+        <a class="present-demo-cta" href="live-demo.html" target="_blank" rel="noopener">
+          <span aria-hidden="true">▶</span> Open Live Demo
+        </a>
+        <div class="theme-toggle" role="group" aria-label="Color theme">
+          <button class="theme-toggle-btn" data-theme-set="light" aria-label="Light theme">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <circle cx="12" cy="12" r="4"/>
+              <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/>
+            </svg>
+            Light
+          </button>
+          <button class="theme-toggle-btn" data-theme-set="dark" aria-label="Dark theme">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+            </svg>
+            Dark
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Hero -->
+    <header class="present-hero">
+      <div class="present-kicker" id="present-kicker">Talking Points</div>
+      <h1 class="present-title" id="present-title">What's Changing in AI</h1>
+      <p class="present-subtitle" id="present-subtitle">20 minutes · Software developers · Skepticism-first · Demo-led</p>
+      <p class="present-intro" id="present-intro">Engineers are a hostile audience for AI talks. They've sat through too many demos, are allergic to hype, and are deeply protective of their craft. This page is the talk script — exact talking points, time allocations, and Q&amp;A prep. The companion <a href="live-demo.html" class="inline-link" target="_blank" rel="noopener">Live Demo page</a> runs a real LLM in the browser for the show-don't-tell segment.</p>
+
+      <div class="present-meta">
+        <div class="present-meta-item">
+          <div class="present-meta-label">Total time</div>
+          <div class="present-meta-value" id="present-total-time">20 min + 5 Q&amp;A</div>
+        </div>
+        <div class="present-meta-item">
+          <div class="present-meta-label">Audience</div>
+          <div class="present-meta-value" id="present-audience">Software developers</div>
+        </div>
+        <div class="present-meta-item">
+          <div class="present-meta-label">Format</div>
+          <div class="present-meta-value" id="present-format">Live in-browser demo · no slides</div>
+        </div>
+      </div>
+
+      <!-- Quick jump -->
+      <nav class="talk-jump" aria-label="Jump to section">
+        <a href="#prep">Prep</a>
+        <a href="#flow">Flow</a>
+        <a href="#time">Time</a>
+        <a href="#shifts">5 Shifts</a>
+        <a href="#disciplines">Disciplines</a>
+        <a href="#reality">Reality</a>
+        <a href="#action">2-week plan</a>
+        <a href="#falsifiers">Falsifiers</a>
+        <a href="#qa">Q&amp;A</a>
+      </nav>
+    </header>
+
+    <!-- Opening line you can copy/paste -->
+    <section class="present-section talk-opener" id="opener">
+      <h2 class="present-section-heading">Opening Line (memorise this)</h2>
+      <blockquote class="talk-quote">
+        <p>“METR ran a randomised controlled trial in 2025. Sixteen senior open-source maintainers. Their own repos, their own tasks. With AI, they got <strong>19% slower</strong>. They believed they got <strong>20% faster</strong>. That's a <strong>39-point self-perception gap</strong> — and that gap is the talk. For the next twenty minutes I'm going to show you what's actually changed under the hood, run a real model on this laptop with no internet, and hand you a two-week experiment you can run on Monday. If by minute twenty you don't have one thing you're going to try this sprint, I've failed.”</p>
+        <cite>— Concede the priors before the room raises them. Cite METR (<a class="inline-link" href="https://arxiv.org/abs/2507.09089" target="_blank" rel="noopener">arXiv:2507.09089</a>) on screen — engineers verify citations.</cite>
+      </blockquote>
+    </section>
+
+    <!-- Preparation checklist -->
+    <section class="present-section" id="prep">
+      <h2 class="present-section-heading">Preparation Checklist</h2>
+      <p class="present-section-desc">Do these before the talk. Each one earns 5–10 minutes of credibility on stage.</p>
+      <div class="prep-grid" id="present-prep-target"></div>
+    </section>
+
+    <!-- The Update Flow (6 steps) -->
+    <section class="present-section" id="flow">
+      <h2 class="present-section-heading">The Update Flow · 6 beats</h2>
+      <p class="present-section-desc">Six beats for delivering this content to a senior engineering audience without losing them in the first ten minutes.</p>
+      <ol class="flow-strip" id="present-flow-target"></ol>
+    </section>
+
+    <!-- Time allocation table -->
+    <section class="present-section" id="time">
+      <h2 class="present-section-heading">Time Allocation</h2>
+      <p class="present-section-desc">Recommended pacing for a tight 20-minute talk plus 5-minute Q&amp;A buffer. The live demo does the heavy lifting — keep the inflection-point overview deliberately brief.</p>
+      <div class="time-grid" id="present-time-target"></div>
+    </section>
+
+    <!-- The 5 Inflection Points (with talking-point script) -->
+    <section class="present-section" id="shifts">
+      <h2 class="present-section-heading">The 5 Inflection Points · talking-point scripts</h2>
+      <p class="present-section-desc">Five structurally different things that didn't exist 12 months ago. Each card has the verified evidence, the implication, and the exact line to land it.</p>
+      <div class="shifts-stack" id="talk-shifts-target"></div>
+    </section>
+
+    <!-- Live Demo CTA — bridge to the demo page -->
+    <section class="present-section talk-bridge" id="demo-bridge">
+      <div class="talk-bridge-inner">
+        <div>
+          <div class="talk-bridge-kicker">Beat 03 · Show, don't tell</div>
+          <h2 class="present-section-heading talk-bridge-title">Open the Live Demo page now</h2>
+          <p class="present-section-desc">Don't read the next bullets — switch tabs. The Live Demo page boots a real Llama or Qwen model 100% inside the browser (WebGPU, no API calls, works offline). Walk through the six tabs in this order: Chat → Reasoning Knob → Persona → Tools → Orchestration → Evals.</p>
+          <p class="talk-bridge-predict-intro">Tee up each tab with a <strong>falsifiable prediction</strong> — engineers trust speakers who let the demo prove (or break) them. If a prediction misses, name it on stage; that's the credibility move.</p>
+          <ul class="talk-bridge-list">
+            <li><strong>Chat</strong> — ~30 sec to show first-token latency and tokens/sec on local hardware. <em>Predict:</em> “TTFT under 2 seconds, ~25–40 tok/s on this MacBook.”</li>
+            <li><strong>Reasoning Knob</strong> — same prompt, three system prompts. <em>Predict:</em> “Watch output tokens roughly 3× from low to high — and watch the answer get measurably better.”</li>
+            <li><strong>Persona</strong> — same weights, same prompt; system prompt changes the output completely. <em>Predict:</em> “Two personas will give near-opposite recommendations on the same code snippet.”</li>
+            <li><strong>Tools</strong> — model emits JSON, browser executes a calculator/HTTP fetch, result fed back. <em>Predict:</em> “Malformed JSON ~10% of calls — you'll see a retry. That's why structured-output mode exists.”</li>
+            <li><strong>Orchestration</strong> — Planner → Researcher → Critic, all the same model, different roles. The “Received from upstream agent” chip on each pane shows how data flows. <em>Predict:</em> “The Critic will catch at least one error the Planner missed. Same weights — the architecture is what raised the floor.”</li>
+            <li><strong>Evals</strong> — pick 2-3 models, pick a test set, click Run. The harness loads each model, runs every question, scores deterministically, and shows a comparison bar chart. <em>Predict:</em> “Bigger model wins on code-fix; smaller model is within 1 point on basic math but 3-4× faster. <strong>This is exactly the artefact I asked you to email me.</strong>”</li>
+          </ul>
+          <details class="demo-fallback">
+            <summary>If the demo fails on stage · recovery script</summary>
+            <p><strong>Say this verbatim, smile, and keep moving:</strong></p>
+            <blockquote class="talk-quote demo-fallback-quote">
+              <p>“Good — this is the honest part. The model is ~880 MB on a hostile conference network, running on WebGPU which two-year-old laptops don't support. Here's the cached transcript I ran at 7am this morning — same model, same hardware class. The point still lands: this ran fully offline, with no API call, on a browser tab.”</p>
+            </blockquote>
+            <p class="demo-fallback-tip">Pre-cache the model on this laptop before the talk (open <code>live-demo.html</code> on the venue Wi-Fi, click <em>Load model</em>, wait for the green pill). Have a 30-second screen recording of the five tabs ready in a second tab as a hard fallback. Never apologise — engineers respect graceful failure more than perfect demos.</p>
+          </details>
+          <a class="present-demo-cta talk-bridge-cta" href="live-demo.html" target="_blank" rel="noopener">
+            <span aria-hidden="true">▶</span> Open Live Demo
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <!-- The New Disciplines -->
+    <section class="present-section" id="disciplines">
+      <h2 class="present-section-heading">The New Disciplines · what to learn this year</h2>
+      <p class="present-section-desc">Four skills that appreciated fastest in 2026. Land each in one sentence — the audience needs to know what to do on Monday morning.</p>
+      <div class="disc-grid" id="talk-disc-target"></div>
+    </section>
+
+    <!-- Reality Check -->
+    <section class="present-section" id="reality">
+      <h2 class="present-section-heading">Reality Check · honest tradeoffs</h2>
+      <p class="present-section-desc">Engineers smell hype instantly. These are the inconvenient findings worth leading with. If you must drop one, keep the METR slowdown and the slop problem.</p>
+      <div class="reality-grid" id="talk-reality-target"></div>
+    </section>
+
+    <!-- Two-week experiment -->
+    <section class="present-section" id="action">
+      <h2 class="present-section-heading" id="present-action-title"></h2>
+      <p class="present-section-desc" id="present-action-subtitle"></p>
+      <div class="action-plan-grid" id="present-action-target"></div>
+    </section>
+
+    <!-- Falsifiers — what would change my mind -->
+    <section class="present-section" id="falsifiers">
+      <h2 class="present-section-heading">What Would Change My Mind</h2>
+      <p class="present-section-desc">Steelman the skeptics in the room before they ask. Three concrete falsifiers — if any of these land in the next 18 months, this talk's thesis is wrong and I'll say so on stage at the next one.</p>
+      <ol class="falsifier-list">
+        <li>
+          <span class="falsifier-tag">Falsifier 01</span>
+          <p><strong>METR's task-doubling curve stalls past 14 months.</strong> The current 7-month doubling is the load-bearing claim for “agents are real now.” If the 2026 follow-up shows the trend bending, the agent thesis weakens — and so does the case for redesigning your workflow around them.</p>
+        </li>
+        <li>
+          <span class="falsifier-tag">Falsifier 02</span>
+          <p><strong>Prompt-injection mitigations ship and hold for 12 consecutive months</strong> with no high-severity bypasses. If that happens, the security objection in the Reality Check evaporates — and the “agents in production” adoption curve gets steeper than I'm forecasting.</p>
+        </li>
+        <li>
+          <span class="falsifier-tag">Falsifier 03</span>
+          <p><strong>The METR 19% slowdown inverts in the 2026 replication.</strong> If experienced devs on real codebases now measure faster <em>and</em> believe they're faster — the perception gap was a tooling-maturity artefact, not a structural finding. Reality Check section gets rewritten.</p>
+        </li>
+      </ol>
+      <p class="falsifier-note">Naming the falsifiers earns the right to make the rest of the claims. Tetlock-style forecasting hygiene is rare in tech talks — that's exactly why it lands.</p>
+    </section>
+
+    <!-- Q&A prep -->
+    <section class="present-section" id="qa">
+      <h2 class="present-section-heading">Q&amp;A Prep</h2>
+      <p class="present-section-desc">Six anticipated questions and suggested answers. Read once before the talk; you'll get at least four of these.</p>
+      <div class="qa-list" id="present-qa-target"></div>
+    </section>
+
+    <!-- Closing line -->
+    <section class="present-section talk-closer">
+      <h2 class="present-section-heading">Closing Line (memorise this too)</h2>
+      <blockquote class="talk-quote">
+        <p>“The METR doubling is seven months. Your next perf cycle is six. So here's the deal: pick one of the three experiments on the slide, give it two weeks, and email me the result — pass, fail, or weird. I'll publish the aggregate at the end of the quarter. <strong>That's our own eval, our own data, our own answer.</strong> Not a vendor's benchmark. Not a Twitter thread. Yours.”</p>
+        <cite>— Promise an artefact. Recruit the audience as data. Concrete &gt; philosophical.</cite>
+      </blockquote>
+    </section>
+
+    <!-- Footer link back to the report -->
+    <footer class="present-footer">
+      <a class="playbook-cta-link" href="index.html">← Back to the full report content</a>
+      <span class="present-footer-divider" aria-hidden="true">·</span>
+      <a class="playbook-cta-link" href="live-demo.html" target="_blank" rel="noopener">Open the Live Demo →</a>
+    </footer>
+
+  </main>
+
+  <script src="talk.js"></script>
+</body>
+</html>

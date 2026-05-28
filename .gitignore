@@ -1,0 +1,18 @@
+# Pre-downloaded MLC model weights — multi-GB, fetched at runtime via WebLLM
+models/
+
+# Local screenshots / draft assets
+_screenshots/
+
+# Build / archive artifacts
+*.zip
+
+# OS / editor
+.DS_Store
+.idea/
+.vscode/
+*.swp
+*~
+
+# Logs
+*.log

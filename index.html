@@ -1,0 +1,696 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>The Strategic Retrospective of Cognitive Systems (2022–2026)</title>
+  
+  <!-- SEO Meta Tags -->
+  <meta name="description" content="A detailed visual analysis of the global shift from generative sequence prediction to stateful autonomous agents, modular hardware interconnects, sovereign local networks, and economic restructuring between 2022 and 2026.">
+  <meta name="keywords" content="Artificial Intelligence, Generative AI, AI Agents, Mixture of Experts, Silicon War, DeepSeek, Nvidia Blackwell, TPU Trillium, AI Regulation, AI Economics">
+  <meta name="author" content="Google DeepMind Team - Advanced Agentic Coding">
+  
+  <!-- Stylings and Fonts -->
+  <link rel="stylesheet" href="styles.css">
+
+  <!-- Theme bootstrap (inline to avoid FOUC) -->
+  <script>
+    (function () {
+      try {
+        var stored = localStorage.getItem('ai-report-theme');
+        var prefers = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+        var theme = stored || (prefers ? 'dark' : 'light');
+        document.documentElement.setAttribute('data-theme', theme);
+      } catch (e) {
+        document.documentElement.setAttribute('data-theme', 'light');
+      }
+    })();
+  </script>
+</head>
+<body>
+
+  <div class="app-container">
+    
+    <!-- SIDEBAR NAVIGATION -->
+    <sidebar id="main-sidebar">
+      <div class="logo-container">
+        <div class="logo-icon">◈</div>
+        <div class="logo-text">AI Retrospective</div>
+      </div>
+
+      <ul class="nav-links">
+        <li class="nav-item active"><a href="#overview" data-target="overview"><span class="nav-icon">①</span> Overview</a></li>
+        <li class="nav-item"><a href="#timeline" data-target="timeline"><span class="nav-icon">②</span> Timeline</a></li>
+        <li class="nav-item"><a href="#models" data-target="models"><span class="nav-icon">③</span> Models</a></li>
+        <li class="nav-item"><a href="#stack" data-target="stack"><span class="nav-icon">④</span> Stack</a></li>
+        <li class="nav-item"><a href="#hardware" data-target="hardware"><span class="nav-icon">⑤</span> Silicon</a></li>
+        <li class="nav-item"><a href="#economics" data-target="economics"><span class="nav-icon">⑥</span> Economics</a></li>
+        <li class="nav-item"><a href="#industry" data-target="industry"><span class="nav-icon">⑦</span> Industry</a></li>
+        <li class="nav-item"><a href="#engineers" data-target="engineers"><span class="nav-icon">⑧</span> Engineers</a></li>
+        <li class="nav-item"><a href="#workforce" data-target="workforce"><span class="nav-icon">⑨</span> Workforce</a></li>
+        <li class="nav-item"><a href="#legal" data-target="legal"><span class="nav-icon">⑩</span> Legal</a></li>
+        <li class="nav-item"><a href="#security" data-target="security"><span class="nav-icon">⑪</span> Geopolitics</a></li>
+      </ul>
+
+      <div class="theme-toggle" role="group" aria-label="Color theme">
+        <button class="theme-toggle-btn" data-theme-set="light" aria-label="Light theme">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <circle cx="12" cy="12" r="4"/>
+            <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/>
+          </svg>
+          Light
+        </button>
+        <button class="theme-toggle-btn" data-theme-set="dark" aria-label="Dark theme">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+          </svg>
+          Dark
+        </button>
+      </div>
+
+      <div class="sidebar-footer">
+        <div>Epoch 2022–2026</div>
+        <div style="margin-top:0.25rem;">Cognitive Systems Report</div>
+      </div>
+    </sidebar>
+
+    <button class="theme-toggle-mobile" id="theme-toggle-mobile" aria-label="Toggle color theme">
+      <svg viewBox="0 0 24 24" aria-hidden="true" id="theme-mobile-icon">
+        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+      </svg>
+    </button>
+    
+    <!-- MAIN CONTENT -->
+    <main>
+      
+      <!-- HERO -->
+      <div class="hero">
+        <div class="hero-subtitle">Strategic Retrospective</div>
+        <h1 id="hero-title">AI Evolution 2022–2026</h1>
+        <p id="hero-desc">Loading detailed retrospective insights...</p>
+
+        <div class="stats-grid" id="stats-target"></div>
+      </div>
+      
+      <!-- OVERVIEW -->
+      <section id="overview">
+        <div class="section-title-wrap">
+          <div class="section-icon-badge">○</div>
+          <div>
+            <h2 class="section-title" id="overview-heading" tabindex="-1">The Big Picture</h2>
+            <div class="section-desc">Six core systemic transitions restructuring computational models and the world economy.</div>
+          </div>
+        </div>
+        
+        <!-- Shifts Target -->
+        <div class="grid-2" id="shifts-target"></div>
+      </section>
+      
+      <!-- TIMELINE -->
+      <section id="timeline">
+        <div class="section-title-wrap">
+          <div class="section-icon-badge">○</div>
+          <div>
+            <h2 class="section-title" id="timeline-heading" tabindex="-1">Chronological Evolution</h2>
+            <div class="section-desc">From symbolic reasoning logic gates to generative mimicry and stateful deliberate routing.</div>
+          </div>
+        </div>
+        
+        <!-- Complete Evolution Timeline -->
+        <div class="evolution-timeline" id="timeline-target" style="margin-bottom: 3rem;"></div>
+        
+        <!-- Milestone Tabs -->
+        <div class="section-title-wrap" style="margin-top: 2rem;">
+          <div class="section-icon-badge">○</div>
+          <div>
+            <h3 style="font-family:var(--font-display); font-size:1.25rem; font-weight:700;">Annual High-Impact Milestones</h3>
+            <div class="section-desc">Select a year to review key technical launches and policy shifts.</div>
+          </div>
+        </div>
+        
+        <div class="pill-tabs" style="margin-bottom: 2rem;">
+          <button class="pill-tab timeline-pill active" data-year="2022" onclick="selectTimelineYear(2022)">2022</button>
+          <button class="pill-tab timeline-pill" data-year="2023" onclick="selectTimelineYear(2023)">2023</button>
+          <button class="pill-tab timeline-pill" data-year="2024" onclick="selectTimelineYear(2024)">2024</button>
+          <button class="pill-tab timeline-pill" data-year="2025" onclick="selectTimelineYear(2025)">2025</button>
+          <button class="pill-tab timeline-pill" data-year="2026" onclick="selectTimelineYear(2026)">2026</button>
+        </div>
+        
+        <!-- Milestones target -->
+        <div class="grid-2" id="milestones-target"></div>
+      </section>
+      
+      <!-- MODELS -->
+      <section id="models">
+        <div class="section-title-wrap">
+          <div class="section-icon-badge">○</div>
+          <div>
+            <h2 class="section-title" id="models-heading" tabindex="-1">Model Capability Evolution</h2>
+            <div class="section-desc">PhD-level benchmarks and sequential context size surges. Every numeric cell is sourced — click a value to verify against its leaderboard or paper. Closed-source vs open-weight SOTA are split because the gap has collapsed differently per benchmark.</div>
+          </div>
+        </div>
+        
+        <div class="table-container" style="margin-bottom: 3rem;">
+          <table class="premium-table">
+            <thead>
+              <tr>
+                <th>Benchmark</th>
+                <th>2022 (SOTA)</th>
+                <th>2024 (SOTA)</th>
+                <th>Closed-Source SOTA (2026)</th>
+                <th>Open-Weight SOTA (2026)</th>
+                <th>Trend</th>
+              </tr>
+            </thead>
+            <tbody id="sota-target"></tbody>
+          </table>
+          <div class="source-footer">
+            <div class="source-footer-header">
+              <span class="source-footer-label">Sources &amp; Methodology</span>
+              <span class="source-snapshot-badge">Snapshot · 2026-05-27</span>
+            </div>
+            <div class="source-pills" aria-label="Models tracked per benchmark">
+              <span class="source-pill"><strong>215</strong> GPQA</span>
+              <span class="source-pill"><strong>91</strong> SWE-Bench Verified</span>
+              <span class="source-pill"><strong>109</strong> AIME 2025</span>
+              <span class="source-pill"><strong>76</strong> HLE</span>
+              <span class="source-pill"><strong>32</strong> MATH-500</span>
+            </div>
+            <div class="source-links">
+              <span class="source-links-label">Primary</span>
+              <a href="https://llm-stats.com/benchmarks" target="_blank" rel="noopener">LLM Stats Leaderboards</a>
+              <span class="source-links-divider" aria-hidden="true">·</span>
+              <span class="source-links-label">Cross-checked</span>
+              <a href="https://benchlm.ai" target="_blank" rel="noopener">BenchLM.ai</a>
+              <a href="https://lmmarketcap.com/benchmarks" target="_blank" rel="noopener">LM Market Cap</a>
+              <span class="source-links-divider" aria-hidden="true">·</span>
+              <span style="color: var(--text-faint);">primary papers</span>
+            </div>
+            <div class="source-footnote">"N/A" indicates the benchmark did not exist in that year. Click any value in the table to verify against its source.</div>
+          </div>
+        </div>
+        
+        <!-- MOE ROUTING EXPLORER WIDGET -->
+        <div class="card moe-explorer">
+          <h3>Mixture-of-Experts Parameter Explorer</h3>
+          <p class="card-desc">Compare sparse MoE activation routing vs. full dense computation across frontier models.</p>
+          
+          <div class="moe-layout">
+            <!-- Buttons selectors -->
+            <div class="moe-model-selector" id="moe-btns"></div>
+            
+            <div class="moe-display">
+              <!-- Visual parameters route -->
+              <div class="moe-visualizer" id="moe-visual-target"></div>
+              
+              <!-- Core details -->
+              <div class="moe-details">
+                <h4 id="moe-model-name" style="font-family:var(--font-display); color:var(--text-main); font-size:1.1rem; font-weight:700;"></h4>
+                
+                <div class="moe-stat-line" style="margin-top: 0.5rem;">
+                  <span>Architectural Class</span>
+                  <strong id="moe-desc-architecture"></strong>
+                </div>
+                <div class="moe-stat-line">
+                  <span>Parametric Split</span>
+                  <strong id="moe-desc-params"></strong>
+                </div>
+                <div class="moe-stat-line">
+                  <span>Context Capacity</span>
+                  <strong id="moe-desc-context"></strong>
+                </div>
+                <div class="moe-stat-line">
+                  <span>Peak SOTA Benchmark</span>
+                  <strong id="moe-desc-gpqa" style="color:var(--secondary);"></strong>
+                </div>
+                
+                <div style="margin-top:0.75rem; font-size:0.85rem; line-height:1.5;">
+                  <strong style="color: var(--text-main);">Primary Functional Advantage:</strong><br>
+                  <span id="moe-desc-capabilities" style="color: var(--text-muted);"></span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- AGENTIC STACK -->
+      <section id="stack">
+        <div class="section-title-wrap">
+          <div class="section-icon-badge">○</div>
+          <div>
+            <div class="section-kicker" id="stack-kicker"></div>
+            <h2 class="section-title" id="stack-heading" tabindex="-1"></h2>
+            <div class="section-desc" id="stack-intro"></div>
+          </div>
+        </div>
+
+        <!-- Stat strip -->
+        <div class="stack-stats" id="stack-stats-target"></div>
+
+        <!-- Six-Layer Harness -->
+        <div class="subsection-header">
+          <h3 class="subsection-title">The Six-Layer Harness</h3>
+          <p class="subsection-desc">Modern agentic harnesses (Claude Code, Codex, Cursor, Devin, Goose) wrap the model with six functional layers around a continuous gather → act → verify loop. The model reasons; the harness mediates every action.</p>
+        </div>
+        <div class="harness-grid" id="harness-grid-target"></div>
+        <div class="loop-strip" id="loop-strip-target"></div>
+
+        <!-- Open Protocols -->
+        <div class="subsection-header">
+          <h3 class="subsection-title">Open Inter-op Protocols</h3>
+          <p class="subsection-desc">Two protocols moved from vendor experiments to Linux Foundation standards between 2024 and 2025, defining the tool↔model and agent↔agent integration layers.</p>
+        </div>
+        <div class="protocol-grid" id="protocol-grid-target"></div>
+
+        <!-- Memory Architectures -->
+        <div class="subsection-header">
+          <h3 class="subsection-title">Memory Architectures</h3>
+          <p class="subsection-desc">Memory is now a first-class primitive. Three vendors ship three distinct default architectures (filesystem, identity-database, vector-store); three frameworks compete on the LongMemEval benchmark; Anthropic's "Dreaming" introduces async hippocampal consolidation between sessions.</p>
+        </div>
+        <div class="table-container">
+          <table class="premium-table">
+            <thead>
+              <tr>
+                <th>Memory System</th>
+                <th>Type</th>
+                <th>License</th>
+                <th>Score</th>
+                <th>Highlight</th>
+              </tr>
+            </thead>
+            <tbody id="memory-target"></tbody>
+          </table>
+        </div>
+
+        <!-- Multi-agent Frameworks -->
+        <div class="subsection-header">
+          <h3 class="subsection-title">Multi-Agent Orchestration Frameworks</h3>
+          <p class="subsection-desc">Four frameworks dominate enterprise multi-agent deployments. The market is shifting from framework-locked solutions to protocol-first designs (Paperclip ACP, A2A) — driven by enterprise demand for portability across vendors.</p>
+        </div>
+        <div class="table-container" style="margin-bottom: 1.25rem;">
+          <table class="premium-table">
+            <thead>
+              <tr>
+                <th>Framework</th>
+                <th>Vendor</th>
+                <th>GitHub Stars</th>
+                <th>PyPI / mo</th>
+                <th>Approach</th>
+                <th>Best For</th>
+              </tr>
+            </thead>
+            <tbody id="frameworks-target"></tbody>
+          </table>
+        </div>
+        <div class="adoption-strip" id="adoption-strip-target"></div>
+
+        <!-- Market Trajectory -->
+        <div class="subsection-header">
+          <h3 class="subsection-title">Agentic Coding: The Killer App</h3>
+          <p class="subsection-desc">The agentic-coding category posted the highest valuations and ARR growth rates in private AI in early 2026. Computer-use agents — closed and open — crossed the 72.4% human OSWorld baseline.</p>
+        </div>
+        <div class="market-grid" id="market-grid-target"></div>
+      </section>
+
+      <!-- SILICON ARMS WAR -->
+      <section id="hardware">
+        <div class="section-title-wrap">
+          <div class="section-icon-badge">○</div>
+          <div>
+            <h2 class="section-title" id="hardware-heading" tabindex="-1">The Silicon Interconnect War</h2>
+            <div class="section-desc">Comparison of modular clusters, custom hardware, and interconnect bottlenecks defining physical computing power. All chip specs cross-checked against vendor datasheets and Flopper.io / LLM-stats / DCD reporting (May 2026).</div>
+          </div>
+        </div>
+        
+        <!-- Hardware target -->
+        <div class="grid-2" id="hardware-target"></div>
+
+        <!-- AI Data Centers sub-section -->
+        <div class="subsection-header">
+          <div class="section-kicker" id="dc-kicker"></div>
+          <h3 class="subsection-title" id="dc-title"></h3>
+          <p class="subsection-desc" id="dc-intro"></p>
+        </div>
+        <div class="stack-stats" id="dc-stats-target"></div>
+        <div class="market-grid" id="dc-projects-target" style="margin-top: 1.75rem;"></div>
+      </section>
+      
+      <!-- ECONOMICS -->
+      <section id="economics">
+        <div class="section-title-wrap">
+          <div class="section-icon-badge">○</div>
+          <div>
+            <h2 class="section-title" id="economics-heading" tabindex="-1">The Strategic Deployment Economics</h2>
+            <div class="section-desc">Comparing metered cloud services to self-hosted open architectures.</div>
+          </div>
+        </div>
+        
+        <div class="table-container" style="margin-bottom: 3rem;">
+          <table class="premium-table">
+            <thead>
+              <tr>
+                <th>Operational Dimension</th>
+                <th>Centralized API Model (e.g. OpenAI, Anthropic)</th>
+                <th>Sovereign Open-Weight Infrastructure</th>
+              </tr>
+            </thead>
+            <tbody id="econ-target"></tbody>
+          </table>
+        </div>
+        
+        <!-- INTERACTIVE CALCULATOR -->
+        <div class="grid-2">
+          <div class="card calc-container">
+            <h3>Sovereign Infrastructure Savings</h3>
+            <p class="card-desc">Estimate monthly API spending to calculate sovereign hosting savings (13.5x deflation factor).</p>
+
+            <div class="slider-group">
+              <div class="slider-labels">
+                <span>Monthly API Spending</span>
+                <strong style="color:var(--primary); font-size:1rem;">$<span id="metered-cost-val">2,275</span>/mo</strong>
+              </div>
+              <input type="range" min="100" max="50000" step="100" value="2275" class="premium-slider" id="metered-cost">
+            </div>
+
+            <div class="calc-results">
+              <div class="calc-box">
+                <div class="calc-val" id="annual-centralized">$27,300</div>
+                <div class="calc-lbl">Annual Centralized Cost</div>
+              </div>
+              <div class="calc-box highlight">
+                <div class="calc-val" id="annual-sovereign">$2,022</div>
+                <div class="calc-lbl">Sovereign Cost</div>
+              </div>
+              <div class="calc-box highlight">
+                <div class="calc-val" id="annual-savings">$25,278</div>
+                <div class="calc-lbl">Annual Savings</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="card" style="display:flex; flex-direction:column; justify-content:center;">
+            <h3>CAGR Projection</h3>
+            <p class="card-desc" style="font-size: 0.85rem;" id="econ-cagr-text"></p>
+            <div style="background:var(--surface-alt); padding:1.25rem; border-radius:var(--radius-md); border:1px solid var(--border); text-align:center;">
+              <span style="font-size:0.7rem; text-transform:uppercase; letter-spacing:0.05em; color:var(--text-faint); display:block; margin-bottom:0.5rem;">Projected 2026 Valuation</span>
+              <strong id="econ-cagr-val" style="font-family:var(--font-display); font-size:1.75rem; color:var(--primary);"></strong>
+            </div>
+          </div>
+        </div>
+      </section>
+      
+      <!-- INDUSTRY SHIFT -->
+      <section id="industry">
+        <div class="section-title-wrap">
+          <div class="section-icon-badge">○</div>
+          <div>
+            <div class="section-kicker" id="industry-kicker"></div>
+            <h2 class="section-title" id="industry-heading" tabindex="-1"></h2>
+            <div class="section-desc" id="industry-intro"></div>
+          </div>
+        </div>
+
+        <!-- Stat strip -->
+        <div class="stack-stats" id="industry-stats-target"></div>
+
+        <!-- Pricing pivot table -->
+        <div class="subsection-header">
+          <h3 class="subsection-title" id="industry-pricing-title"></h3>
+          <p class="subsection-desc" id="industry-pricing-desc"></p>
+        </div>
+        <div class="table-container">
+          <table class="premium-table">
+            <thead>
+              <tr>
+                <th>Dimension</th>
+                <th>Legacy SaaS (per-seat)</th>
+                <th>Agentic Era (consumption / outcome)</th>
+              </tr>
+            </thead>
+            <tbody id="industry-pricing-target"></tbody>
+          </table>
+        </div>
+
+        <!-- Software giant moves -->
+        <div class="subsection-header">
+          <h3 class="subsection-title">How the Giants Are Repositioning</h3>
+          <p class="subsection-desc">Each major software platform is taking a distinct stance on the agent transition — from infrastructure orchestration (AWS) to vertical integration (Microsoft) to consumption-priced agent platforms (Salesforce) to model-vendor compute lock-in (Anthropic + OpenAI).</p>
+        </div>
+        <div class="market-grid" id="industry-giants-target"></div>
+
+        <!-- Pullback signals -->
+        <div class="subsection-header">
+          <h3 class="subsection-title">The Pullback Signals</h3>
+          <p class="subsection-desc">Not every story is up-and-to-the-right. Three signals show where agent autonomy is hitting cost, reliability, or ROI ceilings — and where humans are coming back into the loop.</p>
+        </div>
+        <div class="market-grid" id="industry-pullbacks-target"></div>
+      </section>
+
+      <!-- FOR ENGINEERS — CONTENT FINDINGS (presenter playbook is a separate page) -->
+      <section id="engineers">
+        <div class="section-title-wrap">
+          <div class="section-icon-badge">○</div>
+          <div>
+            <div class="section-kicker" id="eng-kicker"></div>
+            <h2 class="section-title" id="eng-heading" tabindex="-1"></h2>
+            <div class="section-desc" id="eng-subtitle"></div>
+          </div>
+        </div>
+
+        <p class="eng-intro" id="eng-intro"></p>
+
+        <!-- Headline stats -->
+        <div class="stack-stats" id="eng-stats-target"></div>
+
+        <!-- CTAs: separate talk script + live in-browser demo pages -->
+        <div class="playbook-cta-pair">
+          <a class="playbook-cta" href="talk.html" target="_blank" rel="noopener">
+            <div class="playbook-cta-icon" aria-hidden="true">📋</div>
+            <div class="playbook-cta-body">
+              <div class="playbook-cta-kicker">Delivering this as a talk?</div>
+              <div class="playbook-cta-title">Open the Talking Points →</div>
+              <div class="playbook-cta-desc">20-minute script for software developers. Per-beat opener, key data, on-stage cues, transitions, and Q&amp;A prep.</div>
+            </div>
+          </a>
+          <a class="playbook-cta" href="live-demo.html" target="_blank" rel="noopener">
+            <div class="playbook-cta-icon" aria-hidden="true">▶</div>
+            <div class="playbook-cta-body">
+              <div class="playbook-cta-kicker">Show, don't tell</div>
+              <div class="playbook-cta-title">Open the Live In-Browser Demo →</div>
+              <div class="playbook-cta-desc">Real frontier-class small LLM running 100% on your laptop via WebGPU. No API keys, works offline. Five demos, one model.</div>
+            </div>
+          </a>
+        </div>
+
+        <!-- The 5 inflection points -->
+        <div class="subsection-header">
+          <h3 class="subsection-title">The 5 Inflection Points</h3>
+          <p class="subsection-desc">Five structurally different things that didn't exist 12 months ago — each with verified evidence and the daily-work implication.</p>
+        </div>
+        <div class="shifts-stack" id="eng-shifts-target"></div>
+
+        <!-- New disciplines -->
+        <div class="subsection-header">
+          <h3 class="subsection-title">The New Disciplines</h3>
+          <p class="subsection-desc">Four skills that appreciated fastest in 2026 — what your team should actually invest in this year.</p>
+        </div>
+        <div class="disc-grid" id="eng-disciplines-target"></div>
+
+        <!-- Reality check -->
+        <div class="subsection-header">
+          <h3 class="subsection-title">Reality Check</h3>
+          <p class="subsection-desc">Honest tradeoffs. Engineers smell hype instantly — these are the inconvenient findings worth leading with.</p>
+        </div>
+        <div class="reality-grid" id="eng-reality-target"></div>
+
+        <!-- Resources / starter kit -->
+        <div class="subsection-header">
+          <h3 class="subsection-title">Starter Kit · Reading List</h3>
+          <p class="subsection-desc">Sources cited above, plus the canonical reading for engineers who want to go deeper.</p>
+        </div>
+        <div class="resource-pills" id="eng-resources-target"></div>
+
+        <!-- Bottom CTA -->
+        <div class="playbook-cta-footer">
+          <a class="playbook-cta-link" href="talk.html" target="_blank" rel="noopener">
+            Open the Talking Points →
+          </a>
+          <span class="present-footer-divider" aria-hidden="true">·</span>
+          <a class="playbook-cta-link" href="live-demo.html" target="_blank" rel="noopener">
+            Open the Live Demo →
+          </a>
+        </div>
+      </section>
+
+      <!-- WORKFORCE -->
+      <section id="workforce">
+        <div class="section-title-wrap">
+          <div class="section-icon-badge">○</div>
+          <div>
+            <h2 class="section-title" id="workforce-heading" tabindex="-1">Workforce & Revenue Efficiency</h2>
+            <div class="section-desc">Deflationary trends, corporate re-architecting, and sector transformations.</div>
+          </div>
+        </div>
+        
+        <!-- Deflation target -->
+        <div class="grid-2" id="deflation-target"></div>
+      </section>
+      
+      <!-- LEGAL BATTLES -->
+      <section id="legal">
+        <div class="section-title-wrap">
+          <div class="section-icon-badge">○</div>
+          <div>
+            <h2 class="section-title" id="legal-heading" tabindex="-1">The Regurgitation Debate & Licensing</h2>
+            <div class="section-desc">Legal cases, exact copying disputes, and the transition to structured partnerships.</div>
+          </div>
+        </div>
+        
+        <!-- Legal target -->
+        <div class="grid-2" id="legal-target"></div>
+      </section>
+      
+      <!-- SECURITY & GEOPOLITICS -->
+      <section id="security">
+        <div class="section-title-wrap">
+          <div class="section-icon-badge">○</div>
+          <div>
+            <h2 class="section-title" id="security-heading" tabindex="-1">Geopolitics & Cybersecurity Threat Profile</h2>
+            <div class="section-desc">Contrasting regulatory regimes, deepfakes, internal shadow endpoints, and Zero-Trust defenses.</div>
+          </div>
+        </div>
+        
+        <div class="table-container" style="margin-bottom: 2rem;">
+          <table class="premium-table">
+            <thead>
+              <tr>
+                <th>Strategic Dimension</th>
+                <th>European Union (Audits & Bans)</th>
+                <th>United States (Deregulation & Preemption)</th>
+              </tr>
+            </thead>
+            <tbody id="geopolitical-target"></tbody>
+          </table>
+        </div>
+        
+        <div class="card" style="border-left:3px solid var(--primary);">
+          <h3>Enterprise Architecture Guidelines</h3>
+          <p class="card-desc" style="margin-bottom: 0;">
+            Securing operations requires hybrid architectures: centralized APIs for complex deliberation tasks, open-weight systems locally for proprietary workflows. Zero-Trust networks must enforce out-of-band verification (OOBV) on all wire transfers and critical database mutations.
+          </p>
+        </div>
+      </section>
+      
+      <footer style="text-align: center; color: var(--text-faint); font-size: 0.75rem; margin-top: 4rem; border-top: 1px solid var(--border); padding-top: 2rem; padding-bottom: 2rem;">
+        <p>Strategic Retrospective of Cognitive Systems (2022–2026)</p>
+        <p style="margin-top: 0.25rem;">Compiled from industry sources. Last updated May 2026.</p>
+      </footer>
+      
+    </main>
+    
+    
+    <!-- ─── SYSTEM 2 EXPLAINER MODAL ─── -->
+    <div class="info-modal-backdrop" id="s2-modal" role="dialog" aria-modal="true" aria-labelledby="s2-modal-title" aria-hidden="true">
+      <div class="info-modal" role="document">
+        <button class="info-modal-close" id="s2-modal-close" aria-label="Close explainer">
+          <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true">
+            <path d="M18 6L6 18M6 6l12 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" fill="none"/>
+          </svg>
+        </button>
+
+        <header class="info-modal-header">
+          <div class="info-modal-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" width="22" height="22">
+              <path d="M12 2a4 4 0 0 0-4 4c0 1 .3 1.9.8 2.7L8 10v5h2v6h4v-6h2v-5l-.8-1.3A4 4 0 0 0 12 2zM10 23h4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+              <circle cx="12" cy="6" r="1.3" fill="currentColor"/>
+            </svg>
+          </div>
+          <div>
+            <div class="info-modal-kicker" id="s2-kicker"></div>
+            <h2 class="info-modal-title" id="s2-modal-title"></h2>
+            <p class="info-modal-subtitle" id="s2-subtitle"></p>
+          </div>
+        </header>
+
+        <div class="info-modal-body">
+
+          <div class="s2-tldr" id="s2-tldr"></div>
+
+          <section class="s2-section">
+            <h3 class="s2-section-heading" id="s2-origin-heading"></h3>
+            <p class="s2-section-body" id="s2-origin-body"></p>
+            <div class="s2-source-pills" id="s2-origin-sources"></div>
+          </section>
+
+          <section class="s2-section">
+            <h3 class="s2-section-heading" id="s2-comparison-heading"></h3>
+            <div class="s2-compare-grid">
+              <div class="s2-compare-col s2-compare-col-1">
+                <div class="s2-compare-col-head">
+                  <span class="s2-compare-badge">System 1</span>
+                  <span class="s2-compare-tagline">The gut</span>
+                </div>
+                <ul class="s2-compare-list" id="s2-compare-s1"></ul>
+              </div>
+              <div class="s2-compare-divider" aria-hidden="true">
+                <span>vs</span>
+              </div>
+              <div class="s2-compare-col s2-compare-col-2">
+                <div class="s2-compare-col-head">
+                  <span class="s2-compare-badge s2-compare-badge-2">System 2</span>
+                  <span class="s2-compare-tagline">The deliberation</span>
+                </div>
+                <ul class="s2-compare-list" id="s2-compare-s2"></ul>
+              </div>
+            </div>
+          </section>
+
+          <section class="s2-section">
+            <h3 class="s2-section-heading" id="s2-cross-heading"></h3>
+            <p class="s2-section-body" id="s2-cross-body"></p>
+            <div class="s2-callout" id="s2-cross-argument"></div>
+            <div class="s2-source-pills" id="s2-cross-sources"></div>
+          </section>
+
+          <section class="s2-section">
+            <h3 class="s2-section-heading">What "System 2" means in modern AI</h3>
+            <div class="s2-meaning-grid" id="s2-meaning-target"></div>
+          </section>
+
+          <section class="s2-section">
+            <h3 class="s2-section-heading">Landmark releases</h3>
+            <ol class="s2-timeline" id="s2-landmarks-target"></ol>
+          </section>
+
+          <section class="s2-section s2-caveat">
+            <h3 class="s2-section-heading" id="s2-caveat-heading"></h3>
+            <p class="s2-section-body" id="s2-caveat-body"></p>
+          </section>
+
+        </div>
+      </div>
+    </div>
+
+    <div class="mobile-nav-bar">
+      <ul class="mobile-nav-list">
+        <li class="mobile-nav-item active"><a href="#overview" data-target="overview">Overview</a></li>
+        <li class="mobile-nav-item"><a href="#timeline" data-target="timeline">Timeline</a></li>
+        <li class="mobile-nav-item"><a href="#models" data-target="models">Models</a></li>
+        <li class="mobile-nav-item"><a href="#stack" data-target="stack">Stack</a></li>
+        <li class="mobile-nav-item"><a href="#hardware" data-target="hardware">Silicon</a></li>
+        <li class="mobile-nav-item"><a href="#economics" data-target="economics">Econ</a></li>
+        <li class="mobile-nav-item"><a href="#industry" data-target="industry">Industry</a></li>
+        <li class="mobile-nav-item"><a href="#engineers" data-target="engineers">Engineers</a></li>
+        <li class="mobile-nav-item"><a href="#workforce" data-target="workforce">Workforce</a></li>
+        <li class="mobile-nav-item"><a href="#legal" data-target="legal">Legal</a></li>
+        <li class="mobile-nav-item"><a href="#security" data-target="security">Geopol</a></li>
+      </ul>
+    </div>
+    
+  </div>
+
+  <!-- Scripts -->
+  <script src="app.js"></script>
+</body>
+</html>
