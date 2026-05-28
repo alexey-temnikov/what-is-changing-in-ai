@@ -104,6 +104,29 @@ async function probeLocalModel(modelId) {
   const configUrl = `${LOCAL_MODELS_BASE}${modelId}/mlc-chat-config.json`;
   try {
     const res = await fetch(configUrl, { method: "HEAD", cache: "no-store" });
+    if (res.ok) return { ok: true, url: new URL(configUrl, window.location.href).href, status: res.status };
+    if (res.status !== 405 && res.status !== 501) {
+      return { ok: false, url: new URL(configUrl, window.location.href).href, status: res.status };
+    }
+  } catch (err) {
+    try {
+      const res = await fetch(configUrl, { method: "GET", cache: "no-store" });
+      return { ok: res.ok, url: new URL(configUrl, window.location.href).href, status: res.status };
+    } catch (getErr) {
+      return { ok: false, url: new URL(configUrl, window.location.href).href, error: getErr.message || err.message || String(getErr) };
+    }
+  }
+  try {
+    const res = await fetch(configUrl, { method: "GET", cache: "no-store" });
+    return { ok: res.ok, url: new URL(configUrl, window.location.href).href, status: res.status };
+  } catch (err) {
+    return { ok: false, url: new URL(configUrl, window.location.href).href, error: err.message || String(err) };
+  }
+}
+
+async function probeLocalFile(url) {
+  try {
+    const res = await fetch(url, { method: "HEAD", cache: "no-store" });
     return res.ok;
   } catch (_) {
     return false;
@@ -112,9 +135,10 @@ async function probeLocalModel(modelId) {
 
 // WebLLM looks up the model_lib (compiled WebGPU kernel WASM) from a default
 // list keyed on the model family + quantisation. When loading locally we have
-// to pin it explicitly. The lib WASM file lives next to the weights in the
-// same folder when downloaded with download-models.sh.
-function buildLocalAppConfig(modelId, defaultConfig) {
+// to pin it explicitly. download-models.sh mirrors that lib next to the
+// weights so the page can run fully offline; older folders can still fall back
+// to WebLLM's default CDN/cache URL for the lib.
+async function buildLocalAppConfig(modelId, defaultConfig) {
   // Find the default entry to inherit overrides + library path.
   const defaultEntry = (defaultConfig?.model_list || []).find(m =>
     m.model_id === modelId || m.model === modelId
@@ -122,18 +146,21 @@ function buildLocalAppConfig(modelId, defaultConfig) {
   // WebLLM passes `model` into `new URL(model)` without a base, which throws
   // for relative paths. Build an absolute URL anchored at the current page.
   const localBase = new URL(`${LOCAL_MODELS_BASE}${modelId}/`, window.location.href).href;
-  // Try to reuse the default model_lib URL if present (libraries are small
-  // enough to fetch from CDN even when weights are local). If not present,
-  // assume we mirrored it locally with the same filename.
-  const modelLib = defaultEntry?.model_lib
-    || new URL(`${modelId.split("-q")[0].replace(/-MLC$/, "")}-webgpu.wasm`, localBase).href;
+  const modelLibName = defaultEntry?.model_lib?.split("/").pop()
+    || `${modelId.split("-q")[0].replace(/-MLC$/, "")}-webgpu.wasm`;
+  const localModelLib = new URL(modelLibName, localBase).href;
+  const hasLocalModelLib = await probeLocalFile(localModelLib);
+  const modelLib = hasLocalModelLib ? localModelLib : (defaultEntry?.model_lib || localModelLib);
   return {
-    model_list: [{
-      model: localBase,
-      model_id: modelId,
-      model_lib: modelLib,
-      overrides: defaultEntry?.overrides || { context_window_size: 4096 }
-    }]
+    appConfig: {
+      model_list: [{
+        model: localBase,
+        model_id: modelId,
+        model_lib: modelLib,
+        overrides: defaultEntry?.overrides || { context_window_size: 4096 }
+      }]
+    },
+    hasLocalModelLib
   };
 }
 
@@ -223,7 +250,11 @@ async function loadModel(modelId) {
   // 1. Probe local folder (./models/<id>/) for pre-downloaded files.
   // 2. Fall back to browser Cache API (already-downloaded CDN weights).
   // 3. Fall back to fresh CDN download.
-  const hasLocal = await probeLocalModel(modelId);
+  const localProbe = await probeLocalModel(modelId);
+  const hasLocal = localProbe.ok;
+  if (!hasLocal) {
+    console.warn("Local model probe failed; falling back to cache/CDN:", localProbe);
+  }
   let cacheHit = false;
   if (!hasLocal) {
     try {
@@ -247,12 +278,18 @@ async function loadModel(modelId) {
   const labelFor = (s) => s === "local"
     ? "💾 from ./models/ · "
     : (s === "cache" ? "📦 from browser cache · " : "🌐 from internet · ");
+  if (!hasLocal) {
+    const detail = localProbe.status ? `HTTP ${localProbe.status}` : (localProbe.error || "not reachable");
+    pText.textContent = `${labelFor(source)}No local model at ${localProbe.url} (${detail}); using ${cacheHit ? "browser cache" : "CDN"}…`;
+  }
 
   const initProgressCallback = (report) => {
     const pct = Math.round((report.progress || 0) * 100);
     fill.style.width = pct + "%";
     pText.textContent = (report.text ? labelFor(source) + report.text : labelFor(source) + `Loading… ${pct}%`);
   };
+
+  let hasLocalModelLib = false;
 
   // Build the CreateMLCEngine call once so we can retry with a different
   // source if the first attempt fails (local files corrupt/incomplete →
@@ -264,7 +301,9 @@ async function loadModel(modelId) {
     }
     const engineOpts = { initProgressCallback };
     if (useLocal) {
-      engineOpts.appConfig = buildLocalAppConfig(modelId, webllm.prebuiltAppConfig);
+      const localConfig = await buildLocalAppConfig(modelId, webllm.prebuiltAppConfig);
+      engineOpts.appConfig = localConfig.appConfig;
+      hasLocalModelLib = localConfig.hasLocalModelLib;
     }
     return webllm.CreateMLCEngine(modelId, engineOpts);
   }
@@ -330,7 +369,9 @@ async function loadModel(modelId) {
     } catch (_) { /* warm-up failures are non-fatal */ }
 
     pText.textContent = source === "local"
-      ? `Ready · ${shortName(modelId)} loaded from ./models/ — fully offline.`
+      ? (hasLocalModelLib
+        ? `Ready · ${shortName(modelId)} loaded from ./models/ — fully offline.`
+        : `Ready · ${shortName(modelId)} weights loaded from ./models/; WebLLM kernel loaded from CDN/cache.`)
       : (source === "cache"
         ? `Ready · ${shortName(modelId)} loaded from browser cache (offline-capable).`
         : `Ready · ${shortName(modelId)} downloaded and cached — next reload is offline-capable.`);
@@ -1080,6 +1121,22 @@ const TOOL_SYSTEM_PROMPT = `You are a tool-using assistant. You can call exactly
 
 ${TOOLS.map(t => `- ${t.name} — ${t.description}`).join("\n")}
 
+COPY THESE PATTERNS:
+User asks: What is 17 * 24? Use calculator.
+Assistant responds: {"tool":"calculator","args":{"expression":"17*24"}}
+User provides: [tool result for calculator] {"result":408}
+Assistant responds: {"final":"17 * 24 = 408."}
+
+User asks: What time is it now in Tokyo? Use get_time.
+Assistant responds: {"tool":"get_time","args":{"city":"Tokyo"}}
+User provides: [tool result for get_time] {"city":"Tokyo","timezone":"Asia/Tokyo","now":"Mon, 01 Jan 2026, 09:00 JST"}
+Assistant responds: {"final":"It is Mon, 01 Jan 2026, 09:00 JST in Tokyo."}
+
+User asks: Search this report for "WebGPU". Return one short finding. Use search_report.
+Assistant responds: {"tool":"search_report","args":{"query":"WebGPU"}}
+User provides: [tool result for search_report] {"matches":["WebGPU lets browser demos run local models."],"total":1}
+Assistant responds: {"final":"One finding: WebGPU lets browser demos run local models."}
+
 PROTOCOL (follow exactly):
 - To call a tool, respond with ONLY a single JSON object on one line:
   {"tool":"<name>","args":{ ... }}
@@ -1206,8 +1263,8 @@ function bindToolsDemo() {
       try {
         const result = await streamCompletion({
           messages, outEl: outPre, abortToken,
-          maxTokens: 600,
-          temperature: 0.2
+          maxTokens: 220,
+          temperature: 0
         });
         raw = result.fullText;
       } catch (err) {

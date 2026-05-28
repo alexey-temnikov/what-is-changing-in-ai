@@ -7,7 +7,7 @@
 #   ./download-models.sh all          # downloads every model in MODELS
 #   ./download-models.sh <id> [<id>]  # downloads only the given ids
 #
-# Requires: bash, curl, and either git-lfs OR enough patience for raw HTTP.
+# Requires: bash, curl, python3, and enough disk space for multi-GB weights.
 # Pages must be served over http(s) — Chrome blocks fetch from file://.
 # After download, run:  python3 -m http.server 8000
 # then open: http://localhost:8000/live-demo.html
@@ -15,6 +15,7 @@
 set -euo pipefail
 
 HF_BASE="https://huggingface.co/mlc-ai"
+WEBLLM_LIB_BASE="https://raw.githubusercontent.com/mlc-ai/binary-mlc-llm-libs/main/web-llm-models/v0_2_48"
 DEST_DIR="$(cd "$(dirname "$0")" && pwd)/models"
 mkdir -p "$DEST_DIR"
 
@@ -27,6 +28,7 @@ ALL_MODELS=(
   "Qwen3-4B-q4f16_1-MLC"
   "Qwen2.5-0.5B-Instruct-q4f16_1-MLC"
   "Qwen2.5-1.5B-Instruct-q4f16_1-MLC"
+  "DeepSeek-R1-Distill-Qwen-7B-q4f16_1-MLC"
 )
 
 # Default = the lightest two (good for a talk where you only need fallbacks).
@@ -52,6 +54,85 @@ ensure_resolve_link() {
   ln -sfn "../" "$target_dir/resolve/main"
 }
 
+file_size() {
+  if stat -f%z "$1" >/dev/null 2>&1; then
+    stat -f%z "$1"
+  else
+    stat -c%s "$1"
+  fi
+}
+
+is_lfs_pointer() {
+  local path="$1"
+  [ -f "$path" ] || return 1
+  head -n 1 "$path" 2>/dev/null | grep -q '^version https://git-lfs.github.com/spec/v1$'
+}
+
+needs_file() {
+  local path="$1"
+  local expected_bytes="${2:-}"
+
+  [ -f "$path" ] || return 0
+  is_lfs_pointer "$path" && return 0
+  [ "$(file_size "$path")" != "0" ] || return 0
+
+  if [ -n "$expected_bytes" ] && [ "$expected_bytes" != "0" ]; then
+    [ "$(file_size "$path")" = "$expected_bytes" ] || return 0
+  fi
+
+  return 1
+}
+
+download_file() {
+  local url="$1"
+  local dest="$2"
+  local label="$3"
+  local tmp="$dest.tmp.$$"
+
+  echo "  ⬇ $label"
+  rm -f "$tmp"
+  if ! curl -fsSL --retry 5 --retry-delay 2 "$url" -o "$tmp"; then
+    rm -f "$tmp"
+    return 1
+  fi
+  mv "$tmp" "$dest"
+}
+
+model_lib_filename() {
+  case "$1" in
+    Llama-3.2-1B-Instruct-q4f16_1-MLC) echo "Llama-3.2-1B-Instruct-q4f16_1-ctx4k_cs1k-webgpu.wasm" ;;
+    Llama-3.2-3B-Instruct-q4f16_1-MLC) echo "Llama-3.2-3B-Instruct-q4f16_1-ctx4k_cs1k-webgpu.wasm" ;;
+    Qwen3-0.6B-q4f16_1-MLC) echo "Qwen3-0.6B-q4f16_1-ctx4k_cs1k-webgpu.wasm" ;;
+    Qwen3-1.7B-q4f16_1-MLC) echo "Qwen3-1.7B-q4f16_1-ctx4k_cs1k-webgpu.wasm" ;;
+    Qwen3-4B-q4f16_1-MLC) echo "Qwen3-4B-q4f16_1-ctx4k_cs1k-webgpu.wasm" ;;
+    Qwen2.5-0.5B-Instruct-q4f16_1-MLC) echo "Qwen2-0.5B-Instruct-q4f16_1-ctx4k_cs1k-webgpu.wasm" ;;
+    Qwen2.5-1.5B-Instruct-q4f16_1-MLC) echo "Qwen2-1.5B-Instruct-q4f16_1-ctx4k_cs1k-webgpu.wasm" ;;
+    DeepSeek-R1-Distill-Qwen-7B-q4f16_1-MLC) echo "Qwen2-7B-Instruct-q4f16_1-ctx4k_cs1k-webgpu.wasm" ;;
+  esac
+}
+
+list_shards() {
+  python3 - "$1" <<'PY'
+import json
+import sys
+
+with open(sys.argv[1]) as f:
+    cache = json.load(f)
+
+records = cache.get("records", [])
+if isinstance(records, dict):
+    records = records.values()
+
+for record in records:
+    if not isinstance(record, dict) or "dataPath" not in record:
+        continue
+    print("{}\t{}".format(
+        record["dataPath"],
+        int(record.get("nbytes") or 0),
+    ))
+PY
+}
+
 download_one() {
   local model_id="$1"
   local target_dir="$DEST_DIR/$model_id"
@@ -61,26 +142,10 @@ download_one() {
   echo "▸ $model_id"
   echo "  → $target_dir"
 
-  if [ -f "$target_dir/mlc-chat-config.json" ]; then
-    echo "  ✓ already present, skipping (delete folder to re-download)"
-    ensure_resolve_link "$target_dir"
-    return
-  fi
-
   mkdir -p "$target_dir"
+  download_via_curl "$model_id" "$target_dir" "$repo_url" || return 1
 
-  # Prefer git-lfs clone for atomicity. Fall back to per-file curl.
-  if command -v git >/dev/null 2>&1 && command -v git-lfs >/dev/null 2>&1; then
-    echo "  ⬇ cloning via git-lfs…"
-    git -C "$DEST_DIR" clone --depth 1 "$repo_url" "$model_id" || {
-      echo "  ✗ git clone failed; falling back to curl"
-      download_via_curl "$model_id" "$target_dir" "$repo_url"
-    }
-  else
-    download_via_curl "$model_id" "$target_dir" "$repo_url"
-  fi
-
-  # Both paths land here; make sure the resolve/main symlink exists.
+  # Make sure the resolve/main symlink exists.
   ensure_resolve_link "$target_dir"
 }
 
@@ -89,48 +154,65 @@ download_via_curl() {
   local target_dir="$2"
   local repo_url="$3"
   local raw_url="$repo_url/resolve/main"
+  local lib_name
+  lib_name="$(model_lib_filename "$model_id")"
 
   # Manifest first: tells us which weight shards to fetch.
-  echo "  ⬇ mlc-chat-config.json"
-  curl -fsSL "$raw_url/mlc-chat-config.json" -o "$target_dir/mlc-chat-config.json"
+  if needs_file "$target_dir/mlc-chat-config.json"; then
+    download_file "$raw_url/mlc-chat-config.json" "$target_dir/mlc-chat-config.json" "mlc-chat-config.json" || return 1
+  else
+    echo "  ✓ mlc-chat-config.json"
+  fi
 
-  echo "  ⬇ ndarray-cache.json"
-  curl -fsSL "$raw_url/ndarray-cache.json" -o "$target_dir/ndarray-cache.json"
+  if needs_file "$target_dir/ndarray-cache.json"; then
+    download_file "$raw_url/ndarray-cache.json" "$target_dir/ndarray-cache.json" "ndarray-cache.json" || return 1
+  else
+    echo "  ✓ ndarray-cache.json"
+  fi
 
-  echo "  ⬇ tokenizer.json"
-  curl -fsSL "$raw_url/tokenizer.json" -o "$target_dir/tokenizer.json" || true
+  if needs_file "$target_dir/tokenizer.json"; then
+    download_file "$raw_url/tokenizer.json" "$target_dir/tokenizer.json" "tokenizer.json" || return 1
+  else
+    echo "  ✓ tokenizer.json"
+  fi
 
   # Some models also have these — best-effort.
   for opt in tokenizer_config.json tokenizer.model vocab.json merges.txt; do
-    curl -fsSL "$raw_url/$opt" -o "$target_dir/$opt" 2>/dev/null || true
+    if needs_file "$target_dir/$opt"; then
+      curl -fL --retry 3 "$raw_url/$opt" -o "$target_dir/$opt" 2>/dev/null || true
+    fi
   done
-
-  # Parse the ndarray-cache to enumerate shards.
-  if command -v python3 >/dev/null 2>&1; then
-    SHARDS=$(python3 -c "
-import json, sys
-with open('$target_dir/ndarray-cache.json') as f:
-    cache = json.load(f)
-records = cache.get('records', [])
-for r in records:
-    print(r['dataPath'])
-")
-  else
-    # Crude fallback: grep dataPath from the JSON.
-    SHARDS=$(grep -oE '"dataPath"[[:space:]]*:[[:space:]]*"[^"]+"' "$target_dir/ndarray-cache.json" | sed -E 's/.*"([^"]+)"$/\1/')
-  fi
 
   local count=0
-  for shard in $SHARDS; do
+  local downloaded=0
+  local shard=""
+  local nbytes=""
+  while IFS=$'\t' read -r shard nbytes; do
+    [ -n "$shard" ] || continue
     count=$((count + 1))
-    if [ -f "$target_dir/$shard" ]; then
+    if ! needs_file "$target_dir/$shard" "$nbytes"; then
+      echo "  ✓ shard $count: $shard"
       continue
     fi
-    echo "  ⬇ shard $count: $shard"
-    curl -fsSL --retry 3 "$raw_url/$shard" -o "$target_dir/$shard"
-  done
+    downloaded=$((downloaded + 1))
+    download_file "$raw_url/$shard" "$target_dir/$shard" "shard $count: $shard" || return 1
+    if needs_file "$target_dir/$shard" "$nbytes"; then
+      echo "  ✗ shard $count still has the wrong size after download"
+      return 1
+    fi
+  done < <(list_shards "$target_dir/ndarray-cache.json")
 
-  echo "  ✓ $count shard(s) downloaded"
+  if [ -n "$lib_name" ]; then
+    if needs_file "$target_dir/$lib_name"; then
+      download_file "$WEBLLM_LIB_BASE/$lib_name" "$target_dir/$lib_name" "WebLLM model lib: $lib_name" || return 1
+    else
+      echo "  ✓ WebLLM model lib: $lib_name"
+    fi
+  else
+    echo "  ! no known WebLLM model lib mapping; local weights may still need CDN/cache for kernels"
+  fi
+
+  echo "  ✓ $count shard(s) verified, $downloaded downloaded"
 
   ensure_resolve_link "$target_dir"
 }
@@ -139,7 +221,9 @@ echo "MLC model downloader → $DEST_DIR"
 echo "Targets: ${TARGETS[*]}"
 
 for m in "${TARGETS[@]}"; do
-  download_one "$m" || echo "  ✗ $m had errors but continuing"
+  if ! download_one "$m"; then
+    echo "  ✗ $m had errors but continuing"
+  fi
 done
 
 # Belt-and-braces: walk every model dir and ensure the resolve/main symlink
