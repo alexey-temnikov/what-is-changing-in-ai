@@ -519,20 +519,24 @@ details.deep-dive summary:hover {
 
 /* ── TIMELINE ── */
 .evolution-timeline {
+  --timeline-content-offset: 2.5rem;
+  --timeline-line-x: 12px;
+  --timeline-line-width: 2px;
+  --timeline-dot-size: 12px;
   display: flex;
   flex-direction: column;
   gap: 1.5rem;
   position: relative;
-  padding-left: 2.5rem;
+  padding-left: var(--timeline-content-offset);
 }
 
 .evolution-timeline::before {
   content: '';
   position: absolute;
-  left: 11px;
+  left: calc(var(--timeline-line-x) - (var(--timeline-line-width) / 2));
   top: 0.5rem;
   bottom: 0.5rem;
-  width: 2px;
+  width: var(--timeline-line-width);
   background: linear-gradient(to bottom, var(--primary), var(--secondary), var(--accent-warm), var(--accent-sky));
   border-radius: 1px;
 }
@@ -543,13 +547,14 @@ details.deep-dive summary:hover {
 
 .timeline-dot {
   position: absolute;
-  left: -32px;
+  left: calc(var(--timeline-line-x) - var(--timeline-content-offset));
   top: 8px;
-  width: 12px;
-  height: 12px;
+  width: var(--timeline-dot-size);
+  height: var(--timeline-dot-size);
   border-radius: 50%;
   background: var(--surface);
   border: 3px solid var(--primary);
+  transform: translateX(-50%);
   z-index: 10;
 }
 
