@@ -1,1069 +1,763 @@
-let reportData = null;
+// ─────────────────────────────────────────────────────────────
+// app.js · CDN React 18 + Babel standalone (JSX, no imports)
+// ─────────────────────────────────────────────────────────────
+const { useState, useEffect, useRef, createContext, useContext, useCallback } = React;
 
-// Initialize App
-document.addEventListener("DOMContentLoaded", () => {
-  setupThemeToggle();
-  fetchData();
-});
-
-// ── THEME TOGGLE ──
-function setupThemeToggle() {
-  const root = document.documentElement;
-  const sunPath = '<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/>';
-  const moonPath = '<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>';
-
-  function applyTheme(next) {
-    if (document.startViewTransition) {
-      document.startViewTransition(() => syncTheme(next));
-    } else {
-      syncTheme(next);
-    }
-    try { localStorage.setItem('ai-report-theme', next); } catch (e) {}
-  }
-
-  function syncTheme(next) {
-    root.setAttribute('data-theme', next);
-    document.querySelectorAll('.theme-toggle-btn').forEach(btn => {
-      btn.classList.toggle('active', btn.getAttribute('data-theme-set') === next);
-    });
-    const mobileIcon = document.getElementById('theme-mobile-icon');
-    if (mobileIcon) {
-      mobileIcon.innerHTML = next === 'dark' ? sunPath : moonPath;
-    }
-  }
-
-  document.querySelectorAll('.theme-toggle-btn').forEach(btn => {
-    btn.addEventListener('click', () => applyTheme(btn.getAttribute('data-theme-set')));
-  });
-
-  const mobileBtn = document.getElementById('theme-toggle-mobile');
-  if (mobileBtn) {
-    mobileBtn.addEventListener('click', () => {
-      const cur = root.getAttribute('data-theme') || 'light';
-      applyTheme(cur === 'dark' ? 'light' : 'dark');
-    });
-  }
-
-  // Initial sync (the inline bootstrap script already set data-theme)
-  syncTheme(root.getAttribute('data-theme') || 'light');
+// ── Data ──────────────────────────────────────────────────────
+async function loadData() {
+  const res = await fetch("data.json");
+  if (!res.ok) throw new Error(`Failed to load data.json (${res.status})`);
+  return res.json();
 }
 
-async function fetchData() {
-  try {
-    const res = await fetch("data.json");
-    if (!res.ok) throw new Error("Failed to load data.json");
-    reportData = await res.json();
-    
-    renderApp();
-    setupCalculators();
-    setupMoEExplorer();
-    setupNavigation();
-    setupSystem2Modal();
-  } catch (error) {
-    console.error("Initialization error:", error);
-    const errorTarget = document.getElementById("hero-desc");
-    if (errorTarget) {
-      errorTarget.innerText = "Failed to load data.json. Make sure it exists in the same folder.";
-      errorTarget.style.color = "var(--accent-warm)";
-    }
-  }
+// ── Theme ─────────────────────────────────────────────────────
+function useTheme() {
+  const [theme, set] = useState(() => document.documentElement.getAttribute("data-theme") || "light");
+  const apply = useCallback((next) => {
+    const commit = () => { document.documentElement.setAttribute("data-theme", next); set(next); };
+    document.startViewTransition ? document.startViewTransition(commit) : commit();
+    try { localStorage.setItem("ai-report-theme", next); } catch {}
+  }, []);
+  return [theme, apply];
 }
 
-// ── NAVIGATION CONTROLLER ──
-function setupNavigation() {
-  const sidebarLinks = document.querySelectorAll(".nav-item a");
-  const mobileLinks = document.querySelectorAll(".mobile-nav-item a");
-  
-  function handleNav(targetId, clickedEl) {
-    // Focus target section
-    const targetSection = document.getElementById(targetId);
-    if (!targetSection) return;
+const SUN = <React.Fragment><circle cx="12" cy="12" r="4" /><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41" /></React.Fragment>;
+const MOON = <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />;
 
-    // Helper to update active nav styles
-    function updateActiveState() {
-      document.querySelectorAll(".nav-item").forEach(item => item.classList.remove("active"));
-      document.querySelectorAll(".mobile-nav-item").forEach(item => item.classList.remove("active"));
-      
-      const parentLi = clickedEl.parentElement;
-      parentLi.classList.add("active");
-      
-      // Match active states across sidebar and mobile
-      const label = clickedEl.getAttribute("data-target");
-      document.querySelectorAll(`[data-target="${label}"]`).forEach(link => {
-        link.parentElement.classList.add("active");
-      });
-    }
-
-    if (document.startViewTransition) {
-      document.startViewTransition(() => {
-        updateActiveState();
-        targetSection.scrollIntoView({ behavior: "smooth", block: "start" });
-        targetSection.querySelector(".section-title")?.focus();
-      });
-    } else {
-      updateActiveState();
-      targetSection.scrollIntoView({ behavior: "smooth", block: "start" });
-      targetSection.querySelector(".section-title")?.focus();
-    }
-  }
-
-  [...sidebarLinks, ...mobileLinks].forEach(link => {
-    link.addEventListener("click", (e) => {
-      e.preventDefault();
-      const targetId = link.getAttribute("href").substring(1);
-      handleNav(targetId, link);
-    });
-  });
-
-  // Intersection Observer to update active navigation links on scroll
-  const observer = new IntersectionObserver((entries) => {
-    entries.forEach(entry => {
-      if (entry.isIntersecting) {
-        const id = entry.target.getAttribute("id");
-        const activeLink = document.querySelector(`.nav-item a[href="#${id}"]`);
-        if (activeLink) {
-          document.querySelectorAll(".nav-item").forEach(item => item.classList.remove("active"));
-          document.querySelectorAll(".mobile-nav-item").forEach(item => item.classList.remove("active"));
-          
-          activeLink.parentElement.classList.add("active");
-          const mobileLink = document.querySelector(`.mobile-nav-item a[href="#${id}"]`);
-          if (mobileLink) mobileLink.parentElement.classList.add("active");
-        }
-      }
-    });
-  }, { threshold: 0.15, rootMargin: "-80px 0px -40% 0px" });
-
-  document.querySelectorAll("section[id]").forEach(sec => observer.observe(sec));
+function ThemeToggle({ theme, setTheme }) {
+  const btn = (mode, label, icon) =>
+    <button className={"theme-toggle-btn" + (theme === mode ? " active" : "")} data-theme-set={mode} aria-label={`${label} theme`} onClick={() => setTheme(mode)}>
+      <svg viewBox="0 0 24 24" aria-hidden="true">{icon}</svg>{label}
+    </button>;
+  return <div className="theme-toggle" role="group" aria-label="Color theme">{btn("light", "Light", SUN)}{btn("dark", "Dark", MOON)}</div>;
 }
 
-// ── RENDER PAGES / MODULES ──
-function renderApp() {
-  if (!reportData) return;
-  
-  // Render Hero
-  document.getElementById("hero-title").innerText = reportData.title;
-  document.getElementById("hero-desc").innerText = reportData.subtitle;
-  
-  // Render Hero Stats
-  const statsContainer = document.getElementById("stats-target");
-  statsContainer.innerHTML = reportData.heroStats.map(stat => `
-    <div class="stat-card">
-      <div class="stat-num">${stat.num}</div>
-      <div class="stat-label">${stat.label}</div>
-      <div class="stat-trend">${stat.trend}</div>
+function ThemeToggleMobile({ theme, setTheme }) {
+  return <button className="theme-toggle-mobile" aria-label="Toggle color theme" onClick={() => setTheme(theme === "dark" ? "light" : "dark")}>
+    <svg viewBox="0 0 24 24" aria-hidden="true">{theme === "dark" ? SUN : MOON}</svg>
+  </button>;
+}
+
+// ── Shared Components ─────────────────────────────────────────
+function FatalError({ message }) {
+  return <p style={{ color: "var(--accent-warm)", padding: "3rem 1rem", textAlign: "center" }}>{message} Serve over HTTP (e.g. <code>python3 -m http.server</code>).</p>;
+}
+
+function StatStrip({ stats }) {
+  return <div className="stack-stats">
+    {stats.map((s, i) => <a key={i} className="stack-stat" href={s.source} target="_blank" rel="noopener" title="View source">
+      <div className="stack-stat-num">{s.num}</div>
+      <div className="stack-stat-label">{s.label}</div>
+      <div className="stack-stat-trend">{s.trend}</div>
+    </a>)}
+  </div>;
+}
+
+function MarketGrid({ items, style }) {
+  return <div className="market-grid" style={style}>
+    {items.map((m, i) => <a key={i} className="market-card" href={m.link} target="_blank" rel="noopener" style={m.cardStyle}>
+      <div className="market-company" style={m.companyStyle}>{m.company}</div>
+      <div className="market-headline" style={m.headlineStyle}>{m.headline}</div>
+      {m.valuation && <div className="market-valuation">{m.valuation}</div>}
+      <div className="market-detail" style={m.detailStyle}>{m.detail}</div>
+      <div className="market-source">View source ↗</div>
+    </a>)}
+  </div>;
+}
+
+function Table({ headers, rows, style }) {
+  return <div className="table-container" style={style}>
+    <table className="premium-table">
+      <thead><tr>{headers.map((h, i) => <th key={i}>{h}</th>)}</tr></thead>
+      <tbody>{rows.map((cells, r) => <tr key={r}>{cells.map((c, i) => <td key={i}>{c}</td>)}</tr>)}</tbody>
+    </table>
+  </div>;
+}
+
+function SubsectionHeader({ title, desc, kicker }) {
+  return <div className="subsection-header">
+    {kicker && <div className="section-kicker">{kicker}</div>}
+    <h3 className="subsection-title">{title}</h3>
+    <p className="subsection-desc">{desc}</p>
+  </div>;
+}
+
+function ShiftCards({ shifts }) {
+  return shifts.map((s, i) => <article key={i} className="shift-card">
+    <div className="shift-card-tag">{s.tag}</div>
+    <h4 className="shift-card-title">{s.title}</h4>
+    <p className="shift-card-summary">{s.summary}</p>
+    <ul className="shift-card-evidence">{s.evidence.map((e, j) => <li key={j}>{e}</li>)}</ul>
+    <div className="shift-card-implication">
+      <span className="shift-card-implication-label">Implication</span>
+      <p>{s.implication}</p>
     </div>
-  `).join("");
-  
-  // Render Overview Shifters
-  const shiftsContainer = document.getElementById("shifts-target");
-  shiftsContainer.innerHTML = reportData.macroShifts.map((shift, index) => `
-    <div class="card">
-      <h3>${shift.icon} ${shift.title}</h3>
-      <p class="card-desc">${shift.desc}</p>
-      <ul class="card-list">
-        ${shift.points.map(pt => `<li>${pt}</li>`).join("")}
-      </ul>
-      <details class="deep-dive" id="details-shift-${index}">
-        <summary>Technical Deep-Dive Details</summary>
-        <div class="deep-dive-content">
-          Comprehensive review verifies this structural change has transitioned the system lifecycle. Full audit trace confirms: ${shift.points.join(" ")}
-        </div>
-      </details>
-    </div>
-  `).join("");
+    <a className="shift-card-source" href={s.sourceLink} target="_blank" rel="noopener">{s.sourceLabel} ↗</a>
+  </article>);
+}
 
-  // Setup support for searchable hidden content (beforematch event)
-  setupBeforematchSupport();
+function DisciplineGrid({ items }) {
+  return <div className="disc-grid">
+    {items.map((d, i) => <div key={i} className="discipline-card">
+      <div className="discipline-num">{d.num}</div>
+      <div className="discipline-title">{d.title}</div>
+      <div className="discipline-desc">{d.desc}</div>
+      <div className="discipline-stack">{d.stack}</div>
+    </div>)}
+  </div>;
+}
 
-  // Render Full Evolution Timeline (1950 - 2026)
-  const timelineTarget = document.getElementById("timeline-target");
-  timelineTarget.innerHTML = reportData.fullEvolutionTimeline.map(item => `
-    <div class="timeline-row">
-      <div class="timeline-dot"></div>
-      <div class="timeline-card">
-        <div class="timeline-header">
-          <div class="timeline-era">${item.era}</div>
-          <span class="timeline-badge">${item.architecture}</span>
-        </div>
-        <div class="timeline-field"><strong>Primary Technical Mechanism:</strong> ${item.mechanism}</div>
-        <div class="timeline-field"><strong>Landmark Release:</strong> ${item.landmark}</div>
-        <div class="timeline-field" style="color: var(--text-faint);"><strong>Core Operational Limitation:</strong> ${item.limitation}</div>
+function RealityGrid({ items }) {
+  return <div className="reality-grid">
+    {items.map((r, i) => <div key={i} className="reality-card">
+      <div className="reality-card-title">{r.title}</div>
+      <p className="reality-card-body">{r.body}</p>
+    </div>)}
+  </div>;
+}
+
+// ── Nav & Layout ──────────────────────────────────────────────
+const NAV = [
+  ["overview","Overview","Overview","①"],["timeline","Timeline","Timeline","②"],
+  ["models","Models","Models","③"],["stack","Stack","Stack","④"],
+  ["hardware","Silicon","Silicon","⑤"],["economics","Economics","Econ","⑥"],
+  ["industry","Industry","Industry","⑦"],["engineers","Engineers","Engineers","⑧"],
+  ["workforce","Workforce","Workforce","⑨"],["legal","Legal","Legal","⑩"],
+  ["security","Geopolitics","Geopol","⑪"],
+];
+
+const MILESTONE_COLOR = { llm:"var(--primary)","open-source":"var(--secondary)",agent:"var(--accent-sky)",robot:"var(--accent-warm)",policy:"var(--text-faint)",science:"var(--secondary)" };
+
+const viewTransition = (fn) => document.startViewTransition ? document.startViewTransition(fn) : fn();
+
+// ── System 2 ──────────────────────────────────────────────────
+const S2Ctx = createContext(() => {});
+function S2Trigger() {
+  const open = useContext(S2Ctx);
+  return <button className="s2-trigger" type="button" onClick={open} aria-label="Open System 2 explainer"><span className="s2-trigger-icon">i</span>System 2</button>;
+}
+function s2(text) {
+  const parts = String(text ?? "").split(/\bSystem 2\b/);
+  if (parts.length === 1) return text;
+  return parts.flatMap((p, i) => i ? [<S2Trigger key={"t"+i} />, p] : [p]);
+}
+
+// ── Section Shell ─────────────────────────────────────────────
+function Section({ id, title, desc, kicker, children }) {
+  return <section id={id}>
+    <div className="section-title-wrap">
+      <div className="section-icon-badge">○</div>
+      <div>
+        {kicker && <div className="section-kicker">{kicker}</div>}
+        <h2 className="section-title" tabIndex={-1}>{title}</h2>
+        <div className="section-desc">{desc}</div>
       </div>
     </div>
-  `).join("");
-  
-  // Render Milestones (Tabs at 2022, 2023, 2024, 2025, 2026)
-  renderTimelineMilestones("2026"); // Default to 2026 milestones
-  
-  // Render Benchmark Table
-  const sotaTarget = document.getElementById("sota-target");
-  const linkStyle = "color: inherit; text-decoration: underline; text-decoration-color: rgba(255,255,255,0.25); text-decoration-thickness: 1px; text-underline-offset: 3px;";
-  const peakClosedStyle = "color: var(--secondary); font-weight: 700; text-decoration: underline; text-decoration-color: rgba(0,229,255,0.45); text-underline-offset: 3px;";
-  const peakOpenStyle = "color: var(--accent-pink); font-weight: 700; text-decoration: underline; text-decoration-color: rgba(255,0,153,0.45); text-underline-offset: 3px;";
-  
-  const cell = (value, link, title, style) => {
-    if (!value || value === "N/A") {
-      const note = title ? ` title="${title.replace(/"/g, "&quot;")}"` : "";
-      return link
-        ? `<a href="${link}" target="_blank" rel="noopener" style="${style || linkStyle}; opacity: 0.6;"${note}>N/A</a>`
-        : `<span style="opacity: 0.6;"${note}>N/A</span>`;
-    }
-    const note = title ? ` title="${title.replace(/"/g, "&quot;")}"` : "";
-    return link
-      ? `<a href="${link}" target="_blank" rel="noopener" style="${style || linkStyle}"${note}>${value}</a>`
-      : `<span${note}>${value}</span>`;
-  };
-  
-  sotaTarget.innerHTML = reportData.benchmarkSota.map(bench => `
-    <tr>
-      <td class="text-primary-color">${cell(bench.benchmark, bench.benchmarkLink, "Benchmark paper / definition", linkStyle)}</td>
-      <td>${cell(bench.y2022, bench.y2022Link, bench.y2022Note || "", linkStyle)}</td>
-      <td>${cell(bench.y2024, bench.y2024Link, bench.y2024Note || "", linkStyle)}</td>
-      <td>${cell(bench.peakClosed, bench.peakClosedLink, bench.peakClosedModel || "", peakClosedStyle)}<div style="font-size: 0.72rem; color: var(--text-muted); margin-top: 2px;">${bench.peakClosedModel || ""}</div></td>
-      <td>${cell(bench.peakOpen, bench.peakOpenLink, bench.peakOpenModel || "", peakOpenStyle)}<div style="font-size: 0.72rem; color: var(--text-muted); margin-top: 2px;">${bench.peakOpenModel || ""}</div></td>
-      <td><span class="trend-up">${bench.trend}</span></td>
-    </tr>
-  `).join("");
-  
-  // ── Render Agentic Stack ──
-  const stack = reportData.agenticStack;
-  if (stack) {
-    const setText = (id, val) => { const el = document.getElementById(id); if (el && val) el.textContent = val; };
-    setText("stack-kicker", stack.kicker);
-    setText("stack-heading", stack.title);
-    setText("stack-intro", stack.intro);
-    
-    // Stat strip
-    const stackStats = document.getElementById("stack-stats-target");
-    if (stackStats && stack.stats) {
-      stackStats.innerHTML = stack.stats.map(s => `
-        <a class="stack-stat" href="${s.source}" target="_blank" rel="noopener" title="View source">
-          <div class="stack-stat-num">${s.num}</div>
-          <div class="stack-stat-label">${s.label}</div>
-          <div class="stack-stat-trend">${s.trend}</div>
-        </a>
-      `).join("");
-    }
-    
-    // Harness layers
-    const harnessGrid = document.getElementById("harness-grid-target");
-    if (harnessGrid && stack.harnessLayers) {
-      harnessGrid.innerHTML = stack.harnessLayers.map(layer => `
-        <div class="harness-card">
-          <div class="harness-card-head">
-            <span class="harness-tier">L${layer.tier}</span>
-            <span class="harness-icon">${layer.icon}</span>
-            <h4 class="harness-name">${layer.name}</h4>
-          </div>
-          <div class="harness-purpose">${layer.purpose}</div>
-          <div class="harness-primitives"><strong>Primitives:</strong> ${layer.primitives}</div>
-        </div>
-      `).join("");
-    }
-    
-    // Loop strip
-    const loopStrip = document.getElementById("loop-strip-target");
-    if (loopStrip && stack.loop) {
-      loopStrip.innerHTML = `
-        <div class="loop-strip-inner">
-          <div class="loop-title">
-            <span class="loop-title-label">Continuous Loop</span>
-            <strong>${stack.loop.title}</strong>
-            <span class="loop-desc">${stack.loop.desc}</span>
-          </div>
-          <div class="loop-phases">
-            ${stack.loop.phases.map((p, i) => `
-              <div class="loop-phase">
-                <span class="loop-phase-icon">${p.icon}</span>
-                <div class="loop-phase-text">
-                  <div class="loop-phase-name">${p.phase}</div>
-                  <div class="loop-phase-tools">${p.tools}</div>
-                </div>
-              </div>
-              ${i < stack.loop.phases.length - 1 ? '<span class="loop-arrow" aria-hidden="true">→</span>' : '<span class="loop-arrow loop-arrow-back" aria-hidden="true">↻</span>'}
-            `).join("")}
-          </div>
-        </div>
-      `;
-    }
-    
-    // Protocols
-    const protocolGrid = document.getElementById("protocol-grid-target");
-    if (protocolGrid && stack.protocols) {
-      protocolGrid.innerHTML = stack.protocols.map(p => `
-        <div class="protocol-card">
-          <div class="protocol-head">
-            <h4 class="protocol-name">${p.name}</h4>
-            <span class="protocol-released">${p.released}</span>
-          </div>
-          <div class="protocol-owner">${p.owner}</div>
-          <p class="protocol-purpose">${p.purpose}</p>
-          <ul class="protocol-stats">
-            ${p.stats.map(s => `<li>${s}</li>`).join("")}
-          </ul>
-          <a class="protocol-link" href="${p.link}" target="_blank" rel="noopener">View source ↗</a>
-        </div>
-      `).join("");
-    }
-    
-    // Memory architectures
-    const memoryTarget = document.getElementById("memory-target");
-    if (memoryTarget && stack.memoryArchitectures) {
-      memoryTarget.innerHTML = stack.memoryArchitectures.map(m => `
-        <tr>
-          <td class="text-primary-color"><a href="${m.link}" target="_blank" rel="noopener" style="color: inherit; text-decoration: none; border-bottom: 1px dashed var(--border-hover);">${m.name}</a></td>
-          <td>${m.type}</td>
-          <td><span class="license-tag">${m.license}</span></td>
-          <td><span class="memory-score">${m.score}</span><div style="font-size: 0.7rem; color: var(--text-faint);">${m.scoreLabel}</div></td>
-          <td style="font-size: 0.82rem; color: var(--text-muted);">${m.highlight}</td>
-        </tr>
-      `).join("");
-    }
-    
-    // Frameworks
-    const frameworksTarget = document.getElementById("frameworks-target");
-    if (frameworksTarget && stack.frameworks) {
-      frameworksTarget.innerHTML = stack.frameworks.map(f => `
-        <tr>
-          <td class="text-primary-color">${f.name}</td>
-          <td>${f.vendor}</td>
-          <td><strong style="color: var(--text-main);">${f.stars}</strong></td>
-          <td>${f.downloads}</td>
-          <td><span class="approach-tag">${f.approach}</span></td>
-          <td style="font-size: 0.82rem; color: var(--text-muted);">${f.best}</td>
-        </tr>
-      `).join("");
-    }
-    
-    // Adoption strip
-    const adoption = stack.frameworkAdoption;
-    const adoptionStrip = document.getElementById("adoption-strip-target");
-    if (adoptionStrip && adoption) {
-      adoptionStrip.innerHTML = `
-        <div class="adoption-row">
-          <div class="adoption-cell">
-            <div class="adoption-num">${adoption.experimenting}</div>
-            <div class="adoption-label">${adoption.experimentingLabel}</div>
-          </div>
-          <div class="adoption-divider" aria-hidden="true"></div>
-          <div class="adoption-cell">
-            <div class="adoption-num adoption-num-prod">${adoption.production}</div>
-            <div class="adoption-label">${adoption.productionLabel}</div>
-          </div>
-          <a class="adoption-source" href="${adoption.source}" target="_blank" rel="noopener">${adoption.sourceLabel} ↗</a>
-        </div>
-      `;
-    }
-    
-    // Market trajectory
-    const marketGrid = document.getElementById("market-grid-target");
-    if (marketGrid && stack.marketTrajectory) {
-      marketGrid.innerHTML = stack.marketTrajectory.map(m => `
-        <a class="market-card" href="${m.link}" target="_blank" rel="noopener">
-          <div class="market-company">${m.company}</div>
-          <div class="market-headline">${m.headline}</div>
-          <div class="market-valuation">${m.valuation}</div>
-          <div class="market-detail">${m.detail}</div>
-          <div class="market-source">View source ↗</div>
-        </a>
-      `).join("");
-    }
-  }
-  
-  // Render Silicon Platforms
-  const hardwareTarget = document.getElementById("hardware-target");
-  hardwareTarget.innerHTML = reportData.hardwarePlatforms.map(hw => `
-    <div class="card">
-      <h3>${hw.name}</h3>
-      <div style="font-size: 0.72rem; color: var(--text-faint); margin-top:-0.5rem; margin-bottom: 0.4rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.03em;">
-        ${hw.developer}
-      </div>
-      ${hw.release ? `<div style="font-size: 0.7rem; color: var(--secondary); margin-bottom: 1rem; font-weight: 600;">${hw.release}</div>` : ''}
-      <ul class="card-list">
-        <li><strong>Compute:</strong> ${hw.capacity}</li>
-        <li><strong>Memory:</strong> ${hw.memory}</li>
-        <li><strong>Interconnect:</strong> ${hw.bandwidth}</li>
-        <li><strong style="color:var(--secondary);">Advantage:</strong> ${hw.advantage}</li>
-        <li><strong style="color:var(--accent-warm);">Bottleneck:</strong> ${hw.bottleneck}</li>
-      </ul>
+    {children}
+  </section>;
+}
+
+// ── Sidebar & Mobile Nav ──────────────────────────────────────
+function Sidebar({ active, onNav, theme, setTheme }) {
+  return <sidebar id="main-sidebar">
+    <div className="logo-container">
+      <div className="logo-icon">◈</div><div className="logo-text">AI Retrospective</div>
     </div>
-  `).join("");
-  
-  // ── Render Data Centers Block ──
-  const dc = reportData.dataCenters;
-  const dcStatsEl = document.getElementById("dc-stats-target");
-  if (dcStatsEl && dc) {
-    document.getElementById("dc-kicker").textContent = dc.kicker || "";
-    document.getElementById("dc-title").textContent = dc.title || "";
-    document.getElementById("dc-intro").textContent = dc.intro || "";
-    dcStatsEl.innerHTML = dc.stats.map(s => `
-      <a class="stack-stat" href="${s.source}" target="_blank" rel="noopener" title="View source">
-        <div class="stack-stat-num">${s.num}</div>
-        <div class="stack-stat-label">${s.label}</div>
-        <div class="stack-stat-trend">${s.trend}</div>
-      </a>
-    `).join("");
-    
-    document.getElementById("dc-projects-target").innerHTML = dc.projects.map(p => `
-      <a class="market-card" href="${p.link}" target="_blank" rel="noopener">
-        <div class="market-company">${p.name}</div>
-        <div class="market-headline" style="font-size: 0.95rem;">${p.scope}</div>
-        <div class="market-detail" style="margin-top: 0.85rem;">${p.highlight}</div>
-        <div class="market-source">View source ↗</div>
-      </a>
-    `).join("");
-  }
-  
-  // Render Economics Comparison Grid
-  const econTarget = document.getElementById("econ-target");
-  econTarget.innerHTML = reportData.economicsSplit.dimensions.map(dim => `
-    <tr>
-      <td class="text-primary-color">${dim.dimension}</td>
-      <td>${dim.centralized}</td>
-      <td style="color: var(--secondary); font-weight: 600;">${dim.sovereign}</td>
-    </tr>
-  `).join("");
-  document.getElementById("econ-cagr-text").innerText = reportData.economicsSplit.cagrDetails;
-  document.getElementById("econ-cagr-val").innerText = reportData.economicsSplit.cagrProjected2026Valuation;
-  
-  // ── Render Industry Shift ──
-  const ind = reportData.industryShift;
-  if (ind) {
-    const setT = (id, v) => { const el = document.getElementById(id); if (el && v !== undefined) el.textContent = v; };
-    setT("industry-kicker", ind.kicker);
-    setT("industry-heading", ind.title);
-    setT("industry-intro", ind.intro);
-    setT("industry-pricing-title", ind.pricingShift?.title);
-    setT("industry-pricing-desc", ind.pricingShift?.desc);
-    
-    // Stat strip
-    const indStats = document.getElementById("industry-stats-target");
-    if (indStats && ind.stats) {
-      indStats.innerHTML = ind.stats.map(s => `
-        <a class="stack-stat" href="${s.source}" target="_blank" rel="noopener" title="View source">
-          <div class="stack-stat-num">${s.num}</div>
-          <div class="stack-stat-label">${s.label}</div>
-          <div class="stack-stat-trend">${s.trend}</div>
-        </a>
-      `).join("");
-    }
-    
-    // Pricing pivot table
-    const pricingTarget = document.getElementById("industry-pricing-target");
-    if (pricingTarget && ind.pricingShift?.rows) {
-      pricingTarget.innerHTML = ind.pricingShift.rows.map(r => `
-        <tr>
-          <td class="text-primary-color">${r.dimension}</td>
-          <td>${r.legacy}</td>
-          <td style="color: var(--secondary); font-weight: 600;">${r.agentic}</td>
-        </tr>
-      `).join("");
-    }
-    
-    // Software giants moves
-    const giantsTarget = document.getElementById("industry-giants-target");
-    if (giantsTarget && ind.giantMoves) {
-      giantsTarget.innerHTML = ind.giantMoves.map(g => `
-        <a class="market-card" href="${g.link}" target="_blank" rel="noopener">
-          <div class="market-company">${g.company}</div>
-          <div class="market-headline">${g.headline}</div>
-          <div class="market-valuation">${g.stance}</div>
-          <div class="market-detail">${g.detail}</div>
-          <div class="market-source">View source ↗</div>
-        </a>
-      `).join("");
-    }
-    
-    // Pullbacks
-    const pullbacksTarget = document.getElementById("industry-pullbacks-target");
-    if (pullbacksTarget && ind.pullbacks) {
-      pullbacksTarget.innerHTML = ind.pullbacks.map(p => `
-        <a class="market-card" href="${p.link}" target="_blank" rel="noopener" style="border-left: 3px solid var(--accent-warm);">
-          <div class="market-company" style="color: var(--accent-warm);">${p.name}</div>
-          <div class="market-headline" style="font-size: 1rem;">${p.trend}</div>
-          <div class="market-detail" style="margin-top: 0.85rem;">${p.detail}</div>
-          <div class="market-source">View source ↗</div>
-        </a>
-      `).join("");
-    }
-  }
-
-  // ── Render Engineers Update — content findings only.
-  //    Flow / Demos / Action plan moved to present.html (Presenter's Playbook). ──
-  const eng = reportData.engineersUpdate;
-  if (eng) {
-    const setT = (id, v) => { const el = document.getElementById(id); if (el && v !== undefined) el.textContent = v; };
-    setT("eng-kicker", eng.kicker);
-    setT("eng-heading", eng.title);
-    setT("eng-subtitle", eng.subtitle);
-    setT("eng-intro", eng.intro);
-
-    const engStats = document.getElementById("eng-stats-target");
-    if (engStats && eng.stats) {
-      engStats.innerHTML = eng.stats.map(s => `
-        <a class="stack-stat" href="${s.source}" target="_blank" rel="noopener" title="View source">
-          <div class="stack-stat-num">${s.num}</div>
-          <div class="stack-stat-label">${s.label}</div>
-          <div class="stack-stat-trend">${s.trend}</div>
-        </a>
-      `).join("");
-    }
-
-    const engShifts = document.getElementById("eng-shifts-target");
-    if (engShifts && eng.shifts) {
-      engShifts.innerHTML = eng.shifts.map(s => `
-        <article class="shift-card">
-          <div class="shift-card-tag">${s.tag}</div>
-          <h4 class="shift-card-title">${s.title}</h4>
-          <p class="shift-card-summary">${s.summary}</p>
-          <ul class="shift-card-evidence">
-            ${s.evidence.map(e => `<li>${e}</li>`).join("")}
-          </ul>
-          <div class="shift-card-implication">
-            <span class="shift-card-implication-label">Implication</span>
-            <p>${s.implication}</p>
-          </div>
-          <a class="shift-card-source" href="${s.sourceLink}" target="_blank" rel="noopener">${s.sourceLabel} ↗</a>
-        </article>
-      `).join("");
-    }
-
-    const engDisc = document.getElementById("eng-disciplines-target");
-    if (engDisc && eng.disciplines) {
-      engDisc.innerHTML = eng.disciplines.map(d => `
-        <div class="discipline-card">
-          <div class="discipline-num">${d.num}</div>
-          <div class="discipline-title">${d.title}</div>
-          <div class="discipline-desc">${d.desc}</div>
-          <div class="discipline-stack">${d.stack}</div>
-        </div>
-      `).join("");
-    }
-
-    const engReality = document.getElementById("eng-reality-target");
-    if (engReality && eng.realityCheck) {
-      engReality.innerHTML = eng.realityCheck.map(r => `
-        <div class="reality-card">
-          <div class="reality-card-title">${r.title}</div>
-          <p class="reality-card-body">${r.body}</p>
-        </div>
-      `).join("");
-    }
-
-    const engResources = document.getElementById("eng-resources-target");
-    if (engResources && eng.resources) {
-      engResources.innerHTML = eng.resources.map(r =>
-        `<a class="resource-pill" href="${r.link}" target="_blank" rel="noopener">${r.label}</a>`
-      ).join("");
-    }
-  }
-  
-  // Render Deflation Impact
-  const deflationTarget = document.getElementById("deflation-target");
-  deflationTarget.innerHTML = reportData.deflationaryImpact.map(def => `
-    <div class="card">
-      <h3>${def.metric}</h3>
-      <ul class="card-list">
-        <li><strong>Pre-AI Baseline:</strong> ${def.baseline}</li>
-        <li><strong>2026 Impact:</strong> ${def.impact}</li>
-        <li><strong style="color:var(--secondary);">Driver:</strong> ${def.driver}</li>
-      </ul>
+    <ul className="nav-links">
+      {NAV.map(([id, label, , icon]) => <li key={id} className={"nav-item" + (active === id ? " active" : "")}>
+        <a href={"#" + id} onClick={(e) => onNav(e, id)}><span className="nav-icon">{icon}</span> {label}</a>
+      </li>)}
+    </ul>
+    <ThemeToggle theme={theme} setTheme={setTheme} />
+    <div className="sidebar-footer">
+      <div>Epoch 2022–2026</div>
+      <div style={{ marginTop: "0.25rem" }}>Cognitive Systems Report</div>
     </div>
-  `).join("");
-  
-  // Render Legal Battles
-  const legalTarget = document.getElementById("legal-target");
-  legalTarget.innerHTML = reportData.legalLitigation.map(leg => `
-    <div class="card" style="border-top: 2px solid var(--primary);">
-      <h3>${leg.case}</h3>
-      <div style="font-size: 0.75rem; color: var(--text-faint); margin-top:-0.5rem; margin-bottom: 0.75rem; font-weight: 600;">
-        ${leg.parties}
-      </div>
-      <p class="card-desc" style="font-size: 0.85rem; margin-bottom: 1rem;">
-        <strong>Dispute:</strong> ${leg.dispute}
-      </p>
-      <div style="font-size: 0.82rem; color: var(--secondary); font-weight: 600;">
-        Status: ${leg.resolution}
+  </sidebar>;
+}
+
+function MobileNav({ active, onNav }) {
+  return <div className="mobile-nav-bar"><ul className="mobile-nav-list">
+    {NAV.map(([id, , short]) => <li key={id} className={"mobile-nav-item" + (active === id ? " active" : "")}>
+      <a href={"#" + id} onClick={(e) => onNav(e, id)}>{short}</a>
+    </li>)}
+  </ul></div>;
+}
+
+// ── Hero ──────────────────────────────────────────────────────
+function Hero({ data }) {
+  return <div className="hero">
+    <div className="hero-subtitle">Strategic Retrospective</div>
+    <h1>{data.title}</h1>
+    <p>{data.subtitle}</p>
+    <div className="stats-grid">
+      {data.heroStats.map((s) => <div key={s.id} className="stat-card">
+        <div className="stat-num">{s.num}</div>
+        <div className="stat-label">{s.label}</div>
+        <div className="stat-trend">{s.trend}</div>
+      </div>)}
+    </div>
+  </div>;
+}
+
+// ── Overview ──────────────────────────────────────────────────
+const supportsBeforematch = "onbeforematch" in HTMLElement.prototype;
+function Overview({ shifts }) {
+  return <Section id="overview" title="The Big Picture" desc="Six core systemic transitions restructuring computational models and the world economy.">
+    <div className="grid-2">
+      {shifts.map((sh, i) => <div key={i} className="card">
+        <h3>{sh.icon} {s2(sh.title)}</h3>
+        <p className="card-desc">{s2(sh.desc)}</p>
+        <ul className="card-list">{sh.points.map((p, j) => <li key={j}>{s2(p)}</li>)}</ul>
+        <details className="deep-dive" open={!supportsBeforematch}>
+          <summary>Technical Deep-Dive Details</summary>
+          <div className="deep-dive-content">
+            Comprehensive review verifies this structural change has transitioned the system lifecycle. Full audit trace confirms: {s2(sh.points.join(" "))}
+          </div>
+        </details>
+      </div>)}
+    </div>
+  </Section>;
+}
+
+// ── Timeline ──────────────────────────────────────────────────
+function Timeline({ data }) {
+  const [year, setYear] = useState("2026");
+  const years = ["2022","2023","2024","2025","2026"];
+  const select = (y) => viewTransition(() => setYear(y));
+  return <Section id="timeline" title="Chronological Evolution" desc="From symbolic reasoning logic gates to generative mimicry and stateful deliberate routing.">
+    <div className="evolution-timeline" style={{ marginBottom: "3rem" }}>
+      {data.fullEvolutionTimeline.map((it, i) => <div key={i} className="timeline-row">
+        <div className="timeline-dot"></div>
+        <div className="timeline-card">
+          <div className="timeline-header">
+            <div className="timeline-era">{s2(it.era)}</div>
+            <span className="timeline-badge">{it.architecture}</span>
+          </div>
+          <div className="timeline-field"><strong>Primary Technical Mechanism:</strong> {s2(it.mechanism)}</div>
+          <div className="timeline-field"><strong>Landmark Release:</strong> {s2(it.landmark)}</div>
+          <div className="timeline-field" style={{ color: "var(--text-faint)" }}><strong>Core Operational Limitation:</strong> {s2(it.limitation)}</div>
+        </div>
+      </div>)}
+    </div>
+    <div className="section-title-wrap" style={{ marginTop: "2rem" }}>
+      <div className="section-icon-badge">○</div>
+      <div>
+        <h3 style={{ fontFamily: "var(--font-display)", fontSize: "1.25rem", fontWeight: 700 }}>Annual High-Impact Milestones</h3>
+        <div className="section-desc">Select a year to review key technical launches and policy shifts.</div>
       </div>
     </div>
-  `).join("");
-  
-  // Render Geopolitical Compass
-  const geopoliticalTarget = document.getElementById("geopolitical-target");
-  geopoliticalTarget.innerHTML = reportData.cybersecurityAndGeopolitics.categories.map(cat => `
-    <tr>
-      <td class="text-primary-color">${cat.category}</td>
-      <td>${cat.eu}</td>
-      <td style="color: var(--secondary); font-weight: 500;">${cat.us}</td>
-    </tr>
-  `).join("");
+    <div className="pill-tabs" style={{ marginBottom: "2rem" }}>
+      {years.map((y) => <button key={y} className={"pill-tab timeline-pill" + (year === y ? " active" : "")} onClick={() => select(y)}>{y}</button>)}
+    </div>
+    <div className="grid-2">
+      {(data.milestones[year] || []).map((ms, i) => {
+        const c = MILESTONE_COLOR[ms.category] || "var(--primary)";
+        return <div key={i} className="card" style={{ borderLeft: `4px solid ${c}` }}>
+          <span style={{ fontSize: "0.7rem", fontWeight: 700, textTransform: "uppercase", color: c, letterSpacing: "0.1em" }}>{ms.category}</span>
+          <h4 style={{ marginTop: "0.25rem", fontSize: "1.05rem", fontFamily: "var(--font-display)", fontWeight: 700 }}>{s2(ms.title)}</h4>
+          <p className="card-desc" style={{ marginTop: "0.5rem", fontSize: "0.85rem", marginBottom: 0 }}>{s2(ms.desc)}</p>
+        </div>;
+      })}
+    </div>
+  </Section>;
 }
 
-// Render dynamic milestones for specific years
-function renderTimelineMilestones(year) {
-  const milestoneTarget = document.getElementById("milestones-target");
-  const milestones = reportData.milestones[year];
-  
-  if (!milestones) return;
-  
-  milestoneTarget.innerHTML = milestones.map(ms => {
-    let tagColor = "var(--primary)";
-    if (ms.category === "llm") tagColor = "var(--primary)";
-    else if (ms.category === "open-source") tagColor = "var(--secondary)";
-    else if (ms.category === "agent") tagColor = "var(--accent-sky)";
-    else if (ms.category === "robot") tagColor = "var(--accent-warm)";
-    else if (ms.category === "policy") tagColor = "var(--text-faint)";
-    else if (ms.category === "science") tagColor = "var(--secondary)";
-    
-    return `
-      <div class="card" style="border-left: 4px solid ${tagColor};">
-        <span style="font-size:0.7rem; font-weight:700; text-transform:uppercase; color: ${tagColor}; letter-spacing:0.1em;">
-          ${ms.category}
-        </span>
-        <h4 style="margin-top: 0.25rem; font-size:1.05rem; font-family:var(--font-display); font-weight:700;">${ms.title}</h4>
-        <p class="card-desc" style="margin-top: 0.5rem; font-size: 0.85rem; margin-bottom:0;">${ms.desc}</p>
+// ── Models ────────────────────────────────────────────────────
+const LINK = { color: "inherit", textDecoration: "underline", textDecorationColor: "rgba(255,255,255,0.25)", textDecorationThickness: "1px", textUnderlineOffset: "3px" };
+const PEAK_CLOSED = { color: "var(--secondary)", fontWeight: 700, textDecoration: "underline", textDecorationColor: "rgba(0,229,255,0.45)", textUnderlineOffset: "3px" };
+const PEAK_OPEN = { color: "var(--accent-pink)", fontWeight: 700, textDecoration: "underline", textDecorationColor: "rgba(255,0,153,0.45)", textUnderlineOffset: "3px" };
+
+function Cell({ value, link, title, style = LINK }) {
+  const na = !value || value === "N/A";
+  const st = na ? { ...style, opacity: 0.6 } : style;
+  const text = na ? "N/A" : value;
+  return link
+    ? <a href={link} target="_blank" rel="noopener" style={st} title={title}>{text}</a>
+    : <span style={na ? { opacity: 0.6 } : undefined} title={title}>{text}</span>;
+}
+
+function SourceFooter() {
+  const pills = [["215","GPQA"],["91","SWE-Bench Verified"],["109","AIME 2025"],["76","HLE"],["32","MATH-500"]];
+  return <div className="source-footer">
+    <div className="source-footer-header">
+      <span className="source-footer-label">Sources & Methodology</span>
+      <span className="source-snapshot-badge">Snapshot · 2026-05-27</span>
+    </div>
+    <div className="source-pills" aria-label="Models tracked per benchmark">
+      {pills.map(([n, l]) => <span key={l} className="source-pill"><strong>{n}</strong> {l}</span>)}
+    </div>
+    <div className="source-links">
+      <span className="source-links-label">Primary</span>
+      <a href="https://llm-stats.com/benchmarks" target="_blank" rel="noopener">LLM Stats Leaderboards</a>
+      <span className="source-links-divider" aria-hidden="true">·</span>
+      <span className="source-links-label">Cross-checked</span>
+      <a href="https://benchlm.ai" target="_blank" rel="noopener">BenchLM.ai</a>
+      <a href="https://lmmarketcap.com/benchmarks" target="_blank" rel="noopener">LM Market Cap</a>
+      <span className="source-links-divider" aria-hidden="true">·</span>
+      <span style={{ color: "var(--text-faint)" }}>primary papers</span>
+    </div>
+    <div className="source-footnote">"N/A" indicates the benchmark did not exist in that year. Click any value in the table to verify against its source.</div>
+  </div>;
+}
+
+function Models({ data }) {
+  const headers = ["Benchmark","2022 (SOTA)","2024 (SOTA)","Closed-Source SOTA (2026)","Open-Weight SOTA (2026)","Trend"];
+  const rows = data.benchmarkSota.map((b) => [
+    <span className="text-primary-color"><Cell value={b.benchmark} link={b.benchmarkLink} title="Benchmark paper / definition" /></span>,
+    <Cell value={b.y2022} link={b.y2022Link} title={b.y2022Note} />,
+    <Cell value={b.y2024} link={b.y2024Link} title={b.y2024Note} />,
+    <React.Fragment><Cell value={b.peakClosed} link={b.peakClosedLink} title={b.peakClosedModel} style={PEAK_CLOSED} /><div style={{ fontSize: "0.72rem", color: "var(--text-muted)", marginTop: "2px" }}>{b.peakClosedModel}</div></React.Fragment>,
+    <React.Fragment><Cell value={b.peakOpen} link={b.peakOpenLink} title={b.peakOpenModel} style={PEAK_OPEN} /><div style={{ fontSize: "0.72rem", color: "var(--text-muted)", marginTop: "2px" }}>{b.peakOpenModel}</div></React.Fragment>,
+    <span className="trend-up">{b.trend}</span>,
+  ]);
+  return <Section id="models" title="Model Capability Evolution" desc="PhD-level benchmarks and sequential context size surges. Every numeric cell is sourced — click a value to verify against its leaderboard or paper. Closed-source vs open-weight SOTA are split because the gap has collapsed differently per benchmark.">
+    <Table headers={headers} rows={rows} style={{ marginBottom: "3rem" }} />
+    <SourceFooter />
+    <MoEExplorer models={data.frontierModels2026} />
+  </Section>;
+}
+
+// ── MoE Explorer ──────────────────────────────────────────────
+function MoEExplorer({ models }) {
+  const [idx, setIdx] = useState(0);
+  const m = models[idx];
+  const isMoE = /Mixture-of-Experts|MoE/.test(m.architecture);
+  return <div className="card moe-explorer">
+    <h3>Mixture-of-Experts Parameter Explorer</h3>
+    <p className="card-desc">Compare sparse MoE activation routing vs. full dense computation across frontier models.</p>
+    <div className="moe-layout">
+      <div className="moe-model-selector">
+        {models.map((mm, i) => <button key={i} className={"moe-btn" + (i === idx ? " active" : "")} onClick={() => setIdx(i)}>{mm.name}</button>)}
       </div>
-    `;
-  }).join("");
-  
-  // Update year tabs active class
-  document.querySelectorAll(".timeline-pill").forEach(pill => {
-    if (pill.getAttribute("data-year") === year) {
-      pill.classList.add("active");
-    } else {
-      pill.classList.remove("active");
-    }
-  });
+      <div className="moe-display">
+        <div className="moe-visualizer" dangerouslySetInnerHTML={{ __html: isMoE ? moeVisual() : denseVisual() }}></div>
+        <div className="moe-details">
+          <h4 style={{ fontFamily: "var(--font-display)", color: "var(--text-main)", fontSize: "1.1rem", fontWeight: 700 }}>{m.name} ({m.developer})</h4>
+          {moeLine("Architectural Class", m.architecture)}
+          {moeLine("Parametric Split", m.parameters)}
+          {moeLine("Context Capacity", m.context)}
+          {moeLine("Peak SOTA Benchmark", m.gpqa, "var(--secondary)")}
+          <div style={{ marginTop: "0.75rem", fontSize: "0.85rem", lineHeight: 1.5 }}>
+            <strong style={{ color: "var(--text-main)" }}>Primary Functional Advantage:</strong><br/>
+            <span style={{ color: "var(--text-muted)" }}>{m.capabilities}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>;
 }
 
-// Handle timeline pill clicking
-window.selectTimelineYear = function(year) {
-  if (document.startViewTransition) {
-    document.startViewTransition(() => renderTimelineMilestones(year.toString()));
-  } else {
-    renderTimelineMilestones(year.toString());
-  }
-};
-
-// ── HEAR FOR SEARCHABLE HIDDEN CONTENT (beforematch) ──
-function setupBeforematchSupport() {
-  // Feature detection for hidden="until-found"
-  const isSupported = 'onbeforematch' in HTMLElement.prototype;
-  
-  if (!isSupported) {
-    // Fallback: Reveal all collapsed details so they are indexable/searchable natively
-    document.querySelectorAll("details.deep-dive").forEach(el => {
-      el.setAttribute("open", "");
-    });
-  } else {
-    // Standard hidden="until-found" listener
-    document.querySelectorAll("details.deep-dive").forEach(detailsEl => {
-      detailsEl.addEventListener("beforematch", () => {
-        detailsEl.setAttribute("open", "");
-      });
-    });
-  }
+function moeLine(label, val, color) {
+  return <div className="moe-stat-line" style={label === "Architectural Class" ? { marginTop: "0.5rem" } : undefined}>
+    <span>{label}</span><strong style={color ? { color } : undefined}>{val}</strong>
+  </div>;
 }
 
-// ── INTERACTIVE CALCULATOR (SAVINGS) ──
-function setupCalculators() {
-  const slider = document.getElementById("metered-cost");
-  const costValDisplay = document.getElementById("metered-cost-val");
-  
-  const annualCentralized = document.getElementById("annual-centralized");
-  const annualSovereign = document.getElementById("annual-sovereign");
-  const annualSavings = document.getElementById("annual-savings");
-  
-  function updateCalculator() {
-    const monthlyCostCentralized = parseInt(slider.value);
-    costValDisplay.innerText = monthlyCostCentralized.toLocaleString();
-    
-    // Compute annual values
-    const centralizedAnnual = monthlyCostCentralized * 12;
-    // Sovereign is 13x cheaper (13-fold savings: $2,275 vs $168 -> centralized / 13)
-    const sovereignAnnual = Math.round(centralizedAnnual / 13.5);
-    const savingsAnnual = centralizedAnnual - sovereignAnnual;
-    
-    annualCentralized.innerText = `$${centralizedAnnual.toLocaleString()}`;
-    annualSovereign.innerText = `$${sovereignAnnual.toLocaleString()}`;
-    annualSavings.innerText = `$${savingsAnnual.toLocaleString()}`;
-  }
-  
-  if (slider) {
-    slider.addEventListener("input", updateCalculator);
-    updateCalculator(); // Run initial calculation
-  }
-}
-
-// ── INTERACTIVE MIXTURE OF EXPERTS EXPLORER ──
-function setupMoEExplorer() {
-  const btnContainer = document.getElementById("moe-btns");
-  if (!btnContainer || !reportData) return;
-  
-  // Render selector buttons
-  btnContainer.innerHTML = reportData.frontierModels2026.map((model, idx) => `
-    <button class="moe-btn ${idx === 0 ? 'active' : ''}" onclick="selectMoEModel(${idx})" data-idx="${idx}">
-      ${model.name}
-    </button>
-  `).join("");
-  
-  selectMoEModel(0); // Display the first model initially
-}
-
-window.selectMoEModel = function(index) {
-  if (!reportData) return;
-  const model = reportData.frontierModels2026[index];
-  
-  // Update button active state
-  document.querySelectorAll(".moe-btn").forEach(btn => {
-    if (parseInt(btn.getAttribute("data-idx")) === index) {
-      btn.classList.add("active");
-    } else {
-      btn.classList.remove("active");
-    }
-  });
-  
-  // Update details
-  document.getElementById("moe-model-name").innerText = `${model.name} (${model.developer})`;
-  document.getElementById("moe-desc-architecture").innerText = model.architecture;
-  document.getElementById("moe-desc-params").innerText = model.parameters;
-  document.getElementById("moe-desc-context").innerText = model.context;
-  document.getElementById("moe-desc-gpqa").innerText = model.gpqa;
-  document.getElementById("moe-desc-capabilities").innerText = model.capabilities;
-  
-  // Compute parameter boxes visualization
-  const visualTarget = document.getElementById("moe-visual-target");
-
-  // Determine expert visual layout based on architecture
-  const isMoE = model.architecture.includes("Mixture-of-Experts") || model.architecture.includes("MoE");
-
-  if (isMoE) {
-    visualTarget.innerHTML = renderMoEVisual();
-  } else {
-    visualTarget.innerHTML = renderDenseVisual();
-  }
-};
-
-// ── ARCHITECTURE SVG VISUALS ──
-function renderDenseVisual() {
-  // Dense transformer flow: token → embed → N stacked layers (all active) → unembed → next token
-  const layerCount = 6;
-  const layers = [];
-  const startY = 50;
-  const gap = 22;
-  for (let i = 0; i < layerCount; i++) {
+function denseVisual() {
+  const n = 6, startY = 50, gap = 22;
+  let layers = "";
+  for (let i = 0; i < n; i++) {
     const y = startY + i * gap;
-    layers.push(`
-      <rect x="120" y="${y}" width="200" height="16" rx="3" class="node-bg-primary" stroke-width="1.5"/>
-      <text x="220" y="${y + 11}" text-anchor="middle" font-size="9" font-weight="600" class="node-text-primary">
-        Layer ${i + 1} · Self-Attn + FFN (active)
-      </text>
-    `);
+    layers += `<rect x="120" y="${y}" width="200" height="16" rx="3" class="node-bg-primary" stroke-width="1.5"/><text x="220" y="${y + 11}" text-anchor="middle" font-size="9" font-weight="600" class="node-text-primary">Layer ${i + 1} · Self-Attn + FFN (active)</text>`;
   }
-
-  return `
-    <div class="moe-visualizer-title">Dense Architecture · Full Forward Pass</div>
-    <svg class="arch-svg" viewBox="0 0 440 230" role="img" aria-label="Dense transformer architecture diagram">
-      <defs>
-        <marker id="arr-dense" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
-          <path d="M0,0 L10,5 L0,10 z" class="arrow-head"/>
-        </marker>
-      </defs>
-
-      <!-- Input token -->
-      <rect x="20" y="100" width="80" height="36" rx="6" class="node-bg-muted" stroke-width="1.5"/>
-      <text x="60" y="116" text-anchor="middle" font-size="10" font-weight="600" class="node-text-main">Input Token</text>
-      <text x="60" y="128" text-anchor="middle" font-size="8" class="node-text-faint">x_t</text>
-
-      <line x1="100" y1="118" x2="118" y2="118" class="arrow-line" marker-end="url(#arr-dense)"/>
-
-      <!-- Stack background -->
-      <rect x="115" y="42" width="210" height="${gap * layerCount + 14}" rx="8" class="layer-stack-fill"/>
-      <text x="220" y="36" text-anchor="middle" font-size="8" font-weight="700" letter-spacing="0.08em" class="node-text-faint">DENSE TRANSFORMER STACK · 100% PARAMS ACTIVE</text>
-
-      ${layers.join('')}
-
-      <!-- Stack to output -->
-      <line x1="320" y1="118" x2="338" y2="118" class="arrow-line" marker-end="url(#arr-dense)"/>
-
-      <!-- Output -->
-      <rect x="340" y="100" width="80" height="36" rx="6" class="node-bg-secondary" stroke-width="1.5"/>
-      <text x="380" y="116" text-anchor="middle" font-size="10" font-weight="600" class="node-text-secondary">Logits</text>
-      <text x="380" y="128" text-anchor="middle" font-size="8" class="node-text-faint">P(x_t+1)</text>
-
-      <!-- Side annotation: cost -->
-      <text x="220" y="${startY + layerCount * gap + 30}" text-anchor="middle" font-size="9" font-weight="600" class="node-text-faint">
-        Compute per token = 100% of parameters
-      </text>
-    </svg>
-    <div class="arch-legend">
-      <span class="arch-legend-item"><span class="arch-legend-dot active-shared"></span>Active layer</span>
-      <span class="arch-legend-item"><span class="arch-legend-dot inactive"></span>None skipped</span>
-    </div>
-    <div class="moe-formula">
-      Active Params = <strong style="color: var(--text-main);">P<sub>total</sub></strong> &nbsp;·&nbsp; every token, every layer
-    </div>
-  `;
+  return `<div class="moe-visualizer-title">Dense Architecture · Full Forward Pass</div>
+  <svg class="arch-svg" viewBox="0 0 440 230" role="img" aria-label="Dense transformer architecture diagram">
+    <defs><marker id="arr-dense" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" class="arrow-head"/></marker></defs>
+    <rect x="20" y="100" width="80" height="36" rx="6" class="node-bg-muted" stroke-width="1.5"/>
+    <text x="60" y="116" text-anchor="middle" font-size="10" font-weight="600" class="node-text-main">Input Token</text>
+    <text x="60" y="128" text-anchor="middle" font-size="8" class="node-text-faint">x_t</text>
+    <line x1="100" y1="118" x2="118" y2="118" class="arrow-line" marker-end="url(#arr-dense)"/>
+    <rect x="115" y="42" width="210" height="${gap * n + 14}" rx="8" class="layer-stack-fill"/>
+    <text x="220" y="36" text-anchor="middle" font-size="8" font-weight="700" letter-spacing="0.08em" class="node-text-faint">DENSE TRANSFORMER STACK · 100% PARAMS ACTIVE</text>
+    ${layers}
+    <line x1="320" y1="118" x2="338" y2="118" class="arrow-line" marker-end="url(#arr-dense)"/>
+    <rect x="340" y="100" width="80" height="36" rx="6" class="node-bg-secondary" stroke-width="1.5"/>
+    <text x="380" y="116" text-anchor="middle" font-size="10" font-weight="600" class="node-text-secondary">Logits</text>
+    <text x="380" y="128" text-anchor="middle" font-size="8" class="node-text-faint">P(x_t+1)</text>
+    <text x="220" y="${startY + n * gap + 30}" text-anchor="middle" font-size="9" font-weight="600" class="node-text-faint">Compute per token = 100% of parameters</text>
+  </svg>
+  <div class="arch-legend"><span class="arch-legend-item"><span class="arch-legend-dot active-shared"></span>Active layer</span><span class="arch-legend-item"><span class="arch-legend-dot inactive"></span>None skipped</span></div>
+  <div class="moe-formula">Active Params = <strong style="color: var(--text-main);">P<sub>total</sub></strong> &nbsp;·&nbsp; every token, every layer</div>`;
 }
 
-function renderMoEVisual() {
-  // MoE: token → router → top-K experts highlighted, rest dim → merged → output
-  const expertCount = 8;
-  const activeIndices = [1, 4]; // top-K = 2
-  const expertHeight = 18;
-  const expertGap = 4;
-  const expertX = 245;
-  const expertW = 105;
-  const stackTop = 30;
-
-  const experts = [];
-  const routeLines = [];
-  const mergeLines = [];
-
+function moeVisual() {
+  const expertCount = 8, active = [1, 4], eh = 18, eg = 4, ex = 245, ew = 105, top = 30;
+  let experts = "", routes = "", merges = "";
   for (let i = 0; i < expertCount; i++) {
-    const y = stackTop + i * (expertHeight + expertGap);
-    const isActive = activeIndices.includes(i);
-    const cls = isActive ? 'node-bg-secondary' : 'node-bg-inactive';
-    const txtCls = isActive ? 'node-text-secondary' : 'node-text-faint';
-    const pulse = isActive ? ' pulse' : '';
-
-    experts.push(`
-      <rect x="${expertX}" y="${y}" width="${expertW}" height="${expertHeight}" rx="3" class="${cls}${pulse}" stroke-width="1.5"/>
-      <text x="${expertX + expertW / 2}" y="${y + expertHeight / 2 + 3}" text-anchor="middle" font-size="9" font-weight="${isActive ? 700 : 500}" class="${txtCls}">
-        Expert ${i + 1}${isActive ? ' · ACTIVE' : ''}
-      </text>
-    `);
-
-    // Router → expert lines
-    const routerY = 118;
-    const expertCenterY = y + expertHeight / 2;
-    const lineCls = isActive ? 'arrow-line-active' : 'arrow-line-dim';
-    routeLines.push(`<path d="M 215 ${routerY} C 230 ${routerY}, 235 ${expertCenterY}, ${expertX} ${expertCenterY}" class="${lineCls}" fill="none"/>`);
-
-    // Active experts → merge
-    if (isActive) {
-      mergeLines.push(`<path d="M ${expertX + expertW} ${expertCenterY} C ${expertX + expertW + 18} ${expertCenterY}, ${expertX + expertW + 22} ${routerY}, 380 ${routerY}" class="arrow-line-active" fill="none"/>`);
-    }
+    const y = top + i * (eh + eg), on = active.includes(i);
+    const cls = on ? "node-bg-secondary" : "node-bg-inactive", txt = on ? "node-text-secondary" : "node-text-faint", pulse = on ? " pulse" : "";
+    experts += `<rect x="${ex}" y="${y}" width="${ew}" height="${eh}" rx="3" class="${cls}${pulse}" stroke-width="1.5"/><text x="${ex + ew / 2}" y="${y + eh / 2 + 3}" text-anchor="middle" font-size="9" font-weight="${on ? 700 : 500}" class="${txt}">Expert ${i + 1}${on ? " · ACTIVE" : ""}</text>`;
+    const cy = y + eh / 2, lc = on ? "arrow-line-active" : "arrow-line-dim";
+    routes += `<path d="M 215 118 C 230 118, 235 ${cy}, ${ex} ${cy}" class="${lc}" fill="none"/>`;
+    if (on) merges += `<path d="M ${ex + ew} ${cy} C ${ex + ew + 18} ${cy}, ${ex + ew + 22} 118, 380 118" class="arrow-line-active" fill="none"/>`;
   }
-
-  return `
-    <div class="moe-visualizer-title">Mixture-of-Experts · Sparse Routing</div>
-    <svg class="arch-svg" viewBox="0 0 430 240" role="img" aria-label="Mixture of Experts routing diagram">
-      <defs>
-        <marker id="arr-active" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
-          <path d="M0,0 L10,5 L0,10 z" class="arrow-head-active"/>
-        </marker>
-        <marker id="arr-dim" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
-          <path d="M0,0 L10,5 L0,10 z" class="arrow-head-dim"/>
-        </marker>
-      </defs>
-
-      <!-- Input token -->
-      <rect x="14" y="100" width="76" height="36" rx="6" class="node-bg-muted" stroke-width="1.5"/>
-      <text x="52" y="116" text-anchor="middle" font-size="10" font-weight="600" class="node-text-main">Token</text>
-      <text x="52" y="128" text-anchor="middle" font-size="8" class="node-text-faint">x_t</text>
-      <line x1="90" y1="118" x2="108" y2="118" class="arrow-line" marker-end="url(#arr-dim)"/>
-
-      <!-- Shared params (embed + attn) -->
-      <rect x="110" y="92" width="60" height="52" rx="6" class="node-bg-primary" stroke-width="1.5"/>
-      <text x="140" y="111" text-anchor="middle" font-size="9" font-weight="700" class="node-text-primary">Shared</text>
-      <text x="140" y="123" text-anchor="middle" font-size="8" class="node-text-primary">Embed +</text>
-      <text x="140" y="133" text-anchor="middle" font-size="8" class="node-text-primary">Attention</text>
-
-      <line x1="170" y1="118" x2="188" y2="118" class="arrow-line" marker-end="url(#arr-dim)"/>
-
-      <!-- Router -->
-      <polygon points="190,118 215,100 215,136" class="node-bg-primary" stroke-width="1.5"/>
-      <text x="201" y="121" text-anchor="middle" font-size="8" font-weight="700" class="node-text-primary">router</text>
-
-      <!-- Expert stack background -->
-      <text x="${expertX + expertW / 2}" y="22" text-anchor="middle" font-size="8" font-weight="700" letter-spacing="0.08em" class="node-text-faint">EXPERT BANK · TOP-${activeIndices.length} ACTIVATED</text>
-
-      ${routeLines.join('')}
-      ${experts.join('')}
-      ${mergeLines.join('')}
-
-      <!-- Merge dot -->
-      <circle cx="380" cy="118" r="5" class="node-bg-secondary" stroke-width="1.5"/>
-
-      <line x1="385" y1="118" x2="402" y2="118" class="arrow-line-active" marker-end="url(#arr-active)"/>
-
-      <!-- Output -->
-      <rect x="350" y="180" width="76" height="36" rx="6" class="node-bg-secondary" stroke-width="1.5"/>
-      <text x="388" y="196" text-anchor="middle" font-size="10" font-weight="600" class="node-text-secondary">Logits</text>
-      <text x="388" y="208" text-anchor="middle" font-size="8" class="node-text-faint">P(x_t+1)</text>
-
-      <line x1="380" y1="124" x2="380" y2="178" class="arrow-line-active" marker-end="url(#arr-active)"/>
-    </svg>
-    <div class="arch-legend">
-      <span class="arch-legend-item"><span class="arch-legend-dot active-shared"></span>Shared</span>
-      <span class="arch-legend-item"><span class="arch-legend-dot active-expert"></span>Active expert</span>
-      <span class="arch-legend-item"><span class="arch-legend-dot inactive"></span>Skipped</span>
-    </div>
-    <div class="moe-formula">
-      Active Params = P<sub>shared</sub> + &Sigma;<sub>i&isin;TopK</sub> P<sub>expert<sub>i</sub></sub> &nbsp;&laquo;&nbsp; P<sub>total</sub>
-    </div>
-  `;
+  return `<div class="moe-visualizer-title">Mixture-of-Experts · Sparse Routing</div>
+  <svg class="arch-svg" viewBox="0 0 430 240" role="img" aria-label="Mixture of Experts routing diagram">
+    <defs>
+      <marker id="arr-active" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" class="arrow-head-active"/></marker>
+      <marker id="arr-dim" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" class="arrow-head-dim"/></marker>
+    </defs>
+    <rect x="14" y="100" width="76" height="36" rx="6" class="node-bg-muted" stroke-width="1.5"/>
+    <text x="52" y="116" text-anchor="middle" font-size="10" font-weight="600" class="node-text-main">Token</text>
+    <text x="52" y="128" text-anchor="middle" font-size="8" class="node-text-faint">x_t</text>
+    <line x1="90" y1="118" x2="108" y2="118" class="arrow-line" marker-end="url(#arr-dim)"/>
+    <rect x="110" y="92" width="60" height="52" rx="6" class="node-bg-primary" stroke-width="1.5"/>
+    <text x="140" y="111" text-anchor="middle" font-size="9" font-weight="700" class="node-text-primary">Shared</text>
+    <text x="140" y="123" text-anchor="middle" font-size="8" class="node-text-primary">Embed +</text>
+    <text x="140" y="133" text-anchor="middle" font-size="8" class="node-text-primary">Attention</text>
+    <line x1="170" y1="118" x2="188" y2="118" class="arrow-line" marker-end="url(#arr-dim)"/>
+    <polygon points="190,118 215,100 215,136" class="node-bg-primary" stroke-width="1.5"/>
+    <text x="201" y="121" text-anchor="middle" font-size="8" font-weight="700" class="node-text-primary">router</text>
+    <text x="${ex + ew / 2}" y="22" text-anchor="middle" font-size="8" font-weight="700" letter-spacing="0.08em" class="node-text-faint">EXPERT BANK · TOP-${active.length} ACTIVATED</text>
+    ${routes}${experts}${merges}
+    <circle cx="380" cy="118" r="5" class="node-bg-secondary" stroke-width="1.5"/>
+    <line x1="385" y1="118" x2="402" y2="118" class="arrow-line-active" marker-end="url(#arr-active)"/>
+    <rect x="350" y="180" width="76" height="36" rx="6" class="node-bg-secondary" stroke-width="1.5"/>
+    <text x="388" y="196" text-anchor="middle" font-size="10" font-weight="600" class="node-text-secondary">Logits</text>
+    <text x="388" y="208" text-anchor="middle" font-size="8" class="node-text-faint">P(x_t+1)</text>
+    <line x1="380" y1="124" x2="380" y2="178" class="arrow-line-active" marker-end="url(#arr-active)"/>
+  </svg>
+  <div class="arch-legend"><span class="arch-legend-item"><span class="arch-legend-dot active-shared"></span>Shared</span><span class="arch-legend-item"><span class="arch-legend-dot active-expert"></span>Active expert</span><span class="arch-legend-item"><span class="arch-legend-dot inactive"></span>Skipped</span></div>
+  <div class="moe-formula">Active Params = P<sub>shared</sub> + &Sigma;<sub>i&isin;TopK</sub> P<sub>expert<sub>i</sub></sub> &nbsp;&laquo;&nbsp; P<sub>total</sub></div>`;
 }
 
+// ── Stack ─────────────────────────────────────────────────────
+function Stack({ stack }) {
+  if (!stack) return null;
+  const a = stack.frameworkAdoption;
+  return <Section id="stack" title={stack.title} desc={stack.intro} kicker={stack.kicker}>
+    <StatStrip stats={stack.stats} />
 
-// ─────────────────────────────────────────────────────────────
-// SYSTEM 2 EXPLAINER MODAL
-// ─────────────────────────────────────────────────────────────
-function setupSystem2Modal() {
-  const data = reportData?.system2Explainer;
-  if (!data) return;
+    <SubsectionHeader title="The Six-Layer Harness" desc="Modern agentic harnesses (Claude Code, Codex, Cursor, Devin, Goose) wrap the model with six functional layers around a continuous gather → act → verify loop. The model reasons; the harness mediates every action." />
+    <div className="harness-grid">
+      {stack.harnessLayers.map((l, i) => <div key={i} className="harness-card">
+        <div className="harness-card-head"><span className="harness-tier">L{l.tier}</span><span className="harness-icon">{l.icon}</span><h4 className="harness-name">{l.name}</h4></div>
+        <div className="harness-purpose">{l.purpose}</div>
+        <div className="harness-primitives"><strong>Primitives:</strong> {l.primitives}</div>
+      </div>)}
+    </div>
 
-  // ── Render modal contents ──
-  const $ = id => document.getElementById(id);
-  const setT = (id, val) => { const el = $(id); if (el && val !== undefined) el.textContent = val; };
-
-  setT("s2-kicker", data.kicker);
-  setT("s2-modal-title", data.title);
-  setT("s2-subtitle", data.subtitle);
-  setT("s2-tldr", data.tldr);
-
-  setT("s2-origin-heading", data.origin?.heading);
-  setT("s2-origin-body", data.origin?.body);
-  const originSrcEl = $("s2-origin-sources");
-  if (originSrcEl && data.origin?.sources) {
-    originSrcEl.innerHTML = data.origin.sources.map(s =>
-      `<a class="s2-source-pill" href="${s.link}" target="_blank" rel="noopener">${s.name}</a>`
-    ).join("");
-  }
-
-  setT("s2-comparison-heading", data.comparison?.heading);
-  const s1List = $("s2-compare-s1");
-  const s2List = $("s2-compare-s2");
-  if (s1List && s2List && data.comparison?.rows) {
-    s1List.innerHTML = data.comparison.rows.map(r =>
-      `<li><strong>${r.axis}</strong>${r.s1}</li>`
-    ).join("");
-    s2List.innerHTML = data.comparison.rows.map(r =>
-      `<li><strong>${r.axis}</strong>${r.s2}</li>`
-    ).join("");
-  }
-
-  setT("s2-cross-heading", data.aiCrossover?.heading);
-  setT("s2-cross-body", data.aiCrossover?.body);
-  setT("s2-cross-argument", data.aiCrossover?.argument);
-  const crossSrcEl = $("s2-cross-sources");
-  if (crossSrcEl && data.aiCrossover?.sources) {
-    crossSrcEl.innerHTML = data.aiCrossover.sources.map(s =>
-      `<a class="s2-source-pill" href="${s.link}" target="_blank" rel="noopener">${s.name}</a>`
-    ).join("");
-  }
-
-  const meaningEl = $("s2-meaning-target");
-  if (meaningEl && data.modernMeaning) {
-    meaningEl.innerHTML = data.modernMeaning.map((m, i) => `
-      <div class="s2-meaning-card">
-        <div class="s2-meaning-card-num">0${i + 1}</div>
-        <div class="s2-meaning-card-title">${m.title}</div>
-        <div class="s2-meaning-card-desc">${m.desc}</div>
+    <div className="loop-strip"><div className="loop-strip-inner">
+      <div className="loop-title"><span className="loop-title-label">Continuous Loop</span><strong>{stack.loop.title}</strong><span className="loop-desc">{stack.loop.desc}</span></div>
+      <div className="loop-phases">
+        {stack.loop.phases.map((p, i) => <React.Fragment key={i}>
+          <div className="loop-phase"><span className="loop-phase-icon">{p.icon}</span><div className="loop-phase-text"><div className="loop-phase-name">{p.phase}</div><div className="loop-phase-tools">{p.tools}</div></div></div>
+          {i < stack.loop.phases.length - 1
+            ? <span className="loop-arrow" aria-hidden="true">→</span>
+            : <span className="loop-arrow loop-arrow-back" aria-hidden="true">↻</span>}
+        </React.Fragment>)}
       </div>
-    `).join("");
-  }
+    </div></div>
 
-  const landmarksEl = $("s2-landmarks-target");
-  if (landmarksEl && data.landmarks) {
-    landmarksEl.innerHTML = data.landmarks.map(l => `
-      <li class="s2-timeline-item">
-        <div class="s2-timeline-head">
-          <a class="s2-timeline-name" href="${l.link}" target="_blank" rel="noopener">${l.name}</a>
-          <span class="s2-timeline-date">${l.date}</span>
+    <SubsectionHeader title="Open Inter-op Protocols" desc="Two protocols moved from vendor experiments to Linux Foundation standards between 2024 and 2025, defining the tool↔model and agent↔agent integration layers." />
+    <div className="protocol-grid">
+      {stack.protocols.map((p, i) => <div key={i} className="protocol-card">
+        <div className="protocol-head"><h4 className="protocol-name">{p.name}</h4><span className="protocol-released">{p.released}</span></div>
+        <div className="protocol-owner">{p.owner}</div>
+        <p className="protocol-purpose">{p.purpose}</p>
+        <ul className="protocol-stats">{p.stats.map((s, j) => <li key={j}>{s}</li>)}</ul>
+        <a className="protocol-link" href={p.link} target="_blank" rel="noopener">View source ↗</a>
+      </div>)}
+    </div>
+
+    <SubsectionHeader title="Memory Architectures" desc={'Memory is now a first-class primitive. Three vendors ship three distinct default architectures (filesystem, identity-database, vector-store); three frameworks compete on the LongMemEval benchmark; Anthropic\'s "Dreaming" introduces async hippocampal consolidation between sessions.'} />
+    <Table headers={["Memory System","Type","License","Score","Highlight"]}
+      rows={stack.memoryArchitectures.map((m) => [
+        <span className="text-primary-color"><a href={m.link} target="_blank" rel="noopener" style={{ color: "inherit", textDecoration: "none", borderBottom: "1px dashed var(--border-hover)" }}>{m.name}</a></span>,
+        m.type,
+        <span className="license-tag">{m.license}</span>,
+        <React.Fragment><span className="memory-score">{m.score}</span><div style={{ fontSize: "0.7rem", color: "var(--text-faint)" }}>{m.scoreLabel}</div></React.Fragment>,
+        <span style={{ fontSize: "0.82rem", color: "var(--text-muted)" }}>{m.highlight}</span>,
+      ])} />
+
+    <SubsectionHeader title="Multi-Agent Orchestration Frameworks" desc="Four frameworks dominate enterprise multi-agent deployments. The market is shifting from framework-locked solutions to protocol-first designs (Paperclip ACP, A2A) — driven by enterprise demand for portability across vendors." />
+    <Table style={{ marginBottom: "1.25rem" }}
+      headers={["Framework","Vendor","GitHub Stars","PyPI / mo","Approach","Best For"]}
+      rows={stack.frameworks.map((f) => [
+        <span className="text-primary-color">{f.name}</span>, f.vendor,
+        <strong style={{ color: "var(--text-main)" }}>{f.stars}</strong>, f.downloads,
+        <span className="approach-tag">{f.approach}</span>,
+        <span style={{ fontSize: "0.82rem", color: "var(--text-muted)" }}>{f.best}</span>,
+      ])} />
+    <div className="adoption-strip"><div className="adoption-row">
+      <div className="adoption-cell"><div className="adoption-num">{a.experimenting}</div><div className="adoption-label">{a.experimentingLabel}</div></div>
+      <div className="adoption-divider" aria-hidden="true"></div>
+      <div className="adoption-cell"><div className="adoption-num adoption-num-prod">{a.production}</div><div className="adoption-label">{a.productionLabel}</div></div>
+      <a className="adoption-source" href={a.source} target="_blank" rel="noopener">{a.sourceLabel} ↗</a>
+    </div></div>
+
+    <SubsectionHeader title="Agentic Coding: The Killer App" desc="The agentic-coding category posted the highest valuations and ARR growth rates in private AI in early 2026. Computer-use agents — closed and open — crossed the 72.4% human OSWorld baseline." />
+    <MarketGrid items={stack.marketTrajectory.map((m) => ({ link: m.link, company: m.company, headline: m.headline, valuation: m.valuation, detail: m.detail }))} />
+  </Section>;
+}
+
+// ── Hardware ──────────────────────────────────────────────────
+function Hardware({ data }) {
+  const dc = data.dataCenters;
+  return <Section id="hardware" title="The Silicon Interconnect War" desc="Comparison of modular clusters, custom hardware, and interconnect bottlenecks defining physical computing power. All chip specs cross-checked against vendor datasheets and Flopper.io / LLM-stats / DCD reporting (May 2026).">
+    <div className="grid-2">
+      {data.hardwarePlatforms.map((hw, i) => <div key={i} className="card">
+        <h3>{hw.name}</h3>
+        <div style={{ fontSize: "0.72rem", color: "var(--text-faint)", marginTop: "-0.5rem", marginBottom: "0.4rem", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.03em" }}>{hw.developer}</div>
+        {hw.release && <div style={{ fontSize: "0.7rem", color: "var(--secondary)", marginBottom: "1rem", fontWeight: 600 }}>{hw.release}</div>}
+        <ul className="card-list">
+          <li><strong>Compute:</strong> {hw.capacity}</li>
+          <li><strong>Memory:</strong> {hw.memory}</li>
+          <li><strong>Interconnect:</strong> {hw.bandwidth}</li>
+          <li><strong style={{ color: "var(--secondary)" }}>Advantage:</strong> {hw.advantage}</li>
+          <li><strong style={{ color: "var(--accent-warm)" }}>Bottleneck:</strong> {hw.bottleneck}</li>
+        </ul>
+      </div>)}
+    </div>
+    {dc && <React.Fragment>
+      <SubsectionHeader kicker={dc.kicker} title={dc.title} desc={dc.intro} />
+      <StatStrip stats={dc.stats} />
+      <MarketGrid style={{ marginTop: "1.75rem" }}
+        items={dc.projects.map((p) => ({ link: p.link, company: p.name, headline: p.scope, headlineStyle: { fontSize: "0.95rem" }, detail: p.highlight, detailStyle: { marginTop: "0.85rem" } }))} />
+    </React.Fragment>}
+  </Section>;
+}
+
+// ── Economics ─────────────────────────────────────────────────
+function Economics({ econ }) {
+  const [cost, setCost] = useState(2275);
+  const centralized = cost * 12;
+  const sovereign = Math.round(centralized / 13.5);
+  const usd = (n) => "$" + n.toLocaleString();
+  return <Section id="economics" title="The Strategic Deployment Economics" desc="Comparing metered cloud services to self-hosted open architectures.">
+    <Table style={{ marginBottom: "3rem" }}
+      headers={["Operational Dimension","Centralized API Model (e.g. OpenAI, Anthropic)","Sovereign Open-Weight Infrastructure"]}
+      rows={econ.dimensions.map((d) => [
+        <span className="text-primary-color">{d.dimension}</span>, d.centralized,
+        <span style={{ color: "var(--secondary)", fontWeight: 600 }}>{d.sovereign}</span>,
+      ])} />
+    <div className="grid-2">
+      <div className="card calc-container">
+        <h3>Sovereign Infrastructure Savings</h3>
+        <p className="card-desc">Estimate monthly API spending to calculate sovereign hosting savings (13.5x deflation factor).</p>
+        <div className="slider-group">
+          <div className="slider-labels"><span>Monthly API Spending</span>
+            <strong style={{ color: "var(--primary)", fontSize: "1rem" }}>${cost.toLocaleString()}/mo</strong></div>
+          <input type="range" min="100" max="50000" step="100" value={cost} className="premium-slider" onInput={(e) => setCost(+e.target.value)} />
         </div>
-        <div class="s2-timeline-note">${l.note}</div>
-      </li>
-    `).join("");
-  }
+        <div className="calc-results">
+          <div className="calc-box"><div className="calc-val">{usd(centralized)}</div><div className="calc-lbl">Annual Centralized Cost</div></div>
+          <div className="calc-box highlight"><div className="calc-val">{usd(sovereign)}</div><div className="calc-lbl">Sovereign Cost</div></div>
+          <div className="calc-box highlight"><div className="calc-val">{usd(centralized - sovereign)}</div><div className="calc-lbl">Annual Savings</div></div>
+        </div>
+      </div>
+      <div className="card" style={{ display: "flex", flexDirection: "column", justifyContent: "center" }}>
+        <h3>CAGR Projection</h3>
+        <p className="card-desc" style={{ fontSize: "0.85rem" }}>{econ.cagrDetails}</p>
+        <div style={{ background: "var(--surface-alt)", padding: "1.25rem", borderRadius: "var(--radius-md)", border: "1px solid var(--border)", textAlign: "center" }}>
+          <span style={{ fontSize: "0.7rem", textTransform: "uppercase", letterSpacing: "0.05em", color: "var(--text-faint)", display: "block", marginBottom: "0.5rem" }}>Projected 2026 Valuation</span>
+          <strong style={{ fontFamily: "var(--font-display)", fontSize: "1.75rem", color: "var(--primary)" }}>{econ.cagrProjected2026Valuation}</strong>
+        </div>
+      </div>
+    </div>
+  </Section>;
+}
 
-  setT("s2-caveat-heading", data.caveat?.heading);
-  setT("s2-caveat-body", data.caveat?.body);
+// ── Industry ──────────────────────────────────────────────────
+function Industry({ ind }) {
+  if (!ind) return null;
+  return <Section id="industry" title={ind.title} desc={ind.intro} kicker={ind.kicker}>
+    <StatStrip stats={ind.stats} />
+    <SubsectionHeader title={ind.pricingShift.title} desc={ind.pricingShift.desc} />
+    <Table headers={["Dimension","Legacy SaaS (per-seat)","Agentic Era (consumption / outcome)"]}
+      rows={ind.pricingShift.rows.map((r) => [
+        <span className="text-primary-color">{r.dimension}</span>, r.legacy,
+        <span style={{ color: "var(--secondary)", fontWeight: 600 }}>{r.agentic}</span>,
+      ])} />
+    <SubsectionHeader title="How the Giants Are Repositioning" desc="Each major software platform is taking a distinct stance on the agent transition — from infrastructure orchestration (AWS) to vertical integration (Microsoft) to consumption-priced agent platforms (Salesforce) to model-vendor compute lock-in (Anthropic + OpenAI)." />
+    <MarketGrid items={ind.giantMoves.map((g) => ({ link: g.link, company: g.company, headline: g.headline, valuation: g.stance, detail: g.detail }))} />
+    <SubsectionHeader title="The Pullback Signals" desc="Not every story is up-and-to-the-right. Three signals show where agent autonomy is hitting cost, reliability, or ROI ceilings — and where humans are coming back into the loop." />
+    <MarketGrid items={ind.pullbacks.map((p) => ({ link: p.link, company: p.name, companyStyle: { color: "var(--accent-warm)" }, headline: p.trend, headlineStyle: { fontSize: "1rem" }, detail: p.detail, detailStyle: { marginTop: "0.85rem" }, cardStyle: { borderLeft: "3px solid var(--accent-warm)" } }))} />
+  </Section>;
+}
 
-  // ── Inject inline triggers wherever "System 2" is mentioned ──
-  injectSystem2Triggers();
+// ── Engineers ─────────────────────────────────────────────────
+function Engineers({ eng }) {
+  if (!eng) return null;
+  const cta = (href, icon, kicker, title, desc) => <a className="playbook-cta" href={href} target="_blank" rel="noopener">
+    <div className="playbook-cta-icon" aria-hidden="true">{icon}</div>
+    <div className="playbook-cta-body"><div className="playbook-cta-kicker">{kicker}</div><div className="playbook-cta-title">{title}</div><div className="playbook-cta-desc">{desc}</div></div></a>;
+  return <Section id="engineers" title={eng.title} desc={eng.subtitle} kicker={eng.kicker}>
+    <p className="eng-intro">{eng.intro}</p>
+    <StatStrip stats={eng.stats} />
+    <div className="playbook-cta-pair">
+      {cta("talk.html", "📋", "Delivering this as a talk?", "Open the Talking Points →", "20-minute script for software developers. Per-beat opener, key data, on-stage cues, transitions, and Q&A prep.")}
+      {cta("live-demo.html", "▶", "Show, don't tell", "Open the Live In-Browser Demo →", "Real frontier-class small LLM running 100% on your laptop via WebGPU. No API keys, works offline. Five demos, one model.")}
+    </div>
+    <SubsectionHeader title="The 5 Inflection Points" desc="Five structurally different things that didn't exist 12 months ago — each with verified evidence and the daily-work implication." />
+    <div className="shifts-stack"><ShiftCards shifts={eng.shifts} /></div>
+    <SubsectionHeader title="The New Disciplines" desc="Four skills that appreciated fastest in 2026 — what your team should actually invest in this year." />
+    <DisciplineGrid items={eng.disciplines} />
+    <SubsectionHeader title="Reality Check" desc="Honest tradeoffs. Engineers smell hype instantly — these are the inconvenient findings worth leading with." />
+    <RealityGrid items={eng.realityCheck} />
+    <SubsectionHeader title="Starter Kit · Reading List" desc="Sources cited above, plus the canonical reading for engineers who want to go deeper." />
+    <div className="resource-pills">
+      {eng.resources.map((r, i) => <a key={i} className="resource-pill" href={r.link} target="_blank" rel="noopener">{r.label}</a>)}
+    </div>
+    <div className="playbook-cta-footer">
+      <a className="playbook-cta-link" href="talk.html" target="_blank" rel="noopener">Open the Talking Points →</a>
+      <span className="present-footer-divider" aria-hidden="true">·</span>
+      <a className="playbook-cta-link" href="live-demo.html" target="_blank" rel="noopener">Open the Live Demo →</a>
+    </div>
+  </Section>;
+}
 
-  // ── Wire up open / close behaviour ──
-  const backdrop = $("s2-modal");
-  const closeBtn = $("s2-modal-close");
-  let lastFocused = null;
+// ── Workforce ─────────────────────────────────────────────────
+function Workforce({ items }) {
+  return <Section id="workforce" title="Workforce & Revenue Efficiency" desc="Deflationary trends, corporate re-architecting, and sector transformations.">
+    <div className="grid-2">{items.map((d, i) => <div key={i} className="card">
+      <h3>{d.metric}</h3>
+      <ul className="card-list">
+        <li><strong>Pre-AI Baseline:</strong> {d.baseline}</li>
+        <li><strong>2026 Impact:</strong> {d.impact}</li>
+        <li><strong style={{ color: "var(--secondary)" }}>Driver:</strong> {d.driver}</li>
+      </ul>
+    </div>)}</div>
+  </Section>;
+}
 
-  function open() {
-    lastFocused = document.activeElement;
-    backdrop.classList.add("is-open");
-    backdrop.setAttribute("aria-hidden", "false");
+// ── Legal ─────────────────────────────────────────────────────
+function Legal({ items }) {
+  return <Section id="legal" title="The Regurgitation Debate & Licensing" desc="Legal cases, exact copying disputes, and the transition to structured partnerships.">
+    <div className="grid-2">{items.map((l, i) => <div key={i} className="card" style={{ borderTop: "2px solid var(--primary)" }}>
+      <h3>{l.case}</h3>
+      <div style={{ fontSize: "0.75rem", color: "var(--text-faint)", marginTop: "-0.5rem", marginBottom: "0.75rem", fontWeight: 600 }}>{l.parties}</div>
+      <p className="card-desc" style={{ fontSize: "0.85rem", marginBottom: "1rem" }}><strong>Dispute:</strong> {l.dispute}</p>
+      <div style={{ fontSize: "0.82rem", color: "var(--secondary)", fontWeight: 600 }}>Status: {l.resolution}</div>
+    </div>)}</div>
+  </Section>;
+}
+
+// ── Security ──────────────────────────────────────────────────
+function Security({ data }) {
+  return <Section id="security" title="Geopolitics & Cybersecurity Threat Profile" desc="Contrasting regulatory regimes, deepfakes, internal shadow endpoints, and Zero-Trust defenses.">
+    <Table style={{ marginBottom: "2rem" }}
+      headers={["Strategic Dimension","European Union (Audits & Bans)","United States (Deregulation & Preemption)"]}
+      rows={data.cybersecurityAndGeopolitics.categories.map((c) => [
+        <span className="text-primary-color">{c.category}</span>, c.eu,
+        <span style={{ color: "var(--secondary)", fontWeight: 500 }}>{c.us}</span>,
+      ])} />
+    <div className="card" style={{ borderLeft: "3px solid var(--primary)" }}>
+      <h3>Enterprise Architecture Guidelines</h3>
+      <p className="card-desc" style={{ marginBottom: 0 }}>Securing operations requires hybrid architectures: centralized APIs for complex deliberation tasks, open-weight systems locally for proprietary workflows. Zero-Trust networks must enforce out-of-band verification (OOBV) on all wire transfers and critical database mutations.</p>
+    </div>
+  </Section>;
+}
+
+// ── System 2 Modal ────────────────────────────────────────────
+function System2Modal({ data, open, onClose }) {
+  const closeRef = useRef(null);
+  useEffect(() => {
+    if (!open) return;
     document.body.classList.add("modal-open");
-    setTimeout(() => closeBtn?.focus(), 50);
-  }
-  function close() {
-    backdrop.classList.remove("is-open");
-    backdrop.setAttribute("aria-hidden", "true");
-    document.body.classList.remove("modal-open");
-    if (lastFocused?.focus) lastFocused.focus();
-  }
-
-  // Expose globally so inline triggers can call it
-  window.openSystem2Modal = open;
-
-  closeBtn?.addEventListener("click", close);
-  backdrop?.addEventListener("click", e => {
-    if (e.target === backdrop) close();
-  });
-  document.addEventListener("keydown", e => {
-    if (e.key === "Escape" && backdrop.classList.contains("is-open")) close();
-  });
+    closeRef.current?.focus();
+    const onKey = (e) => e.key === "Escape" && onClose();
+    document.addEventListener("keydown", onKey);
+    return () => { document.body.classList.remove("modal-open"); document.removeEventListener("keydown", onKey); };
+  }, [open, onClose]);
+  if (!data) return null;
+  const pills = (list) => <div className="s2-source-pills">{list.map((s, i) => <a key={i} className="s2-source-pill" href={s.link} target="_blank" rel="noopener">{s.name}</a>)}</div>;
+  return <div className={"info-modal-backdrop" + (open ? " is-open" : "")} role="dialog" aria-modal="true" aria-hidden={String(!open)} onClick={(e) => e.target === e.currentTarget && onClose()}>
+    <div className="info-modal" role="document">
+      <button className="info-modal-close" ref={closeRef} aria-label="Close explainer" onClick={onClose}>
+        <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M18 6L6 18M6 6l12 12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" fill="none"/></svg>
+      </button>
+      <header className="info-modal-header">
+        <div className="info-modal-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" width="22" height="22"><path d="M12 2a4 4 0 0 0-4 4c0 1 .3 1.9.8 2.7L8 10v5h2v6h4v-6h2v-5l-.8-1.3A4 4 0 0 0 12 2zM10 23h4" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" fill="none"/><circle cx="12" cy="6" r="1.3" fill="currentColor"/></svg>
+        </div>
+        <div><div className="info-modal-kicker">{data.kicker}</div><h2 className="info-modal-title">{data.title}</h2><p className="info-modal-subtitle">{data.subtitle}</p></div>
+      </header>
+      <div className="info-modal-body">
+        <div className="s2-tldr">{data.tldr}</div>
+        <section className="s2-section"><h3 className="s2-section-heading">{data.origin.heading}</h3><p className="s2-section-body">{data.origin.body}</p>{pills(data.origin.sources)}</section>
+        <section className="s2-section"><h3 className="s2-section-heading">{data.comparison.heading}</h3>
+          <div className="s2-compare-grid">
+            <div className="s2-compare-col s2-compare-col-1"><div className="s2-compare-col-head"><span className="s2-compare-badge">System 1</span><span className="s2-compare-tagline">The gut</span></div>
+              <ul className="s2-compare-list">{data.comparison.rows.map((r, i) => <li key={i}><strong>{r.axis}</strong>{r.s1}</li>)}</ul></div>
+            <div className="s2-compare-divider" aria-hidden="true"><span>vs</span></div>
+            <div className="s2-compare-col s2-compare-col-2"><div className="s2-compare-col-head"><span className="s2-compare-badge s2-compare-badge-2">System 2</span><span className="s2-compare-tagline">The deliberation</span></div>
+              <ul className="s2-compare-list">{data.comparison.rows.map((r, i) => <li key={i}><strong>{r.axis}</strong>{r.s2}</li>)}</ul></div>
+          </div>
+        </section>
+        <section className="s2-section"><h3 className="s2-section-heading">{data.aiCrossover.heading}</h3><p className="s2-section-body">{data.aiCrossover.body}</p><div className="s2-callout">{data.aiCrossover.argument}</div>{pills(data.aiCrossover.sources)}</section>
+        <section className="s2-section"><h3 className="s2-section-heading">What "System 2" means in modern AI</h3>
+          <div className="s2-meaning-grid">{data.modernMeaning.map((m, i) => <div key={i} className="s2-meaning-card"><div className="s2-meaning-card-num">0{i + 1}</div><div className="s2-meaning-card-title">{m.title}</div><div className="s2-meaning-card-desc">{m.desc}</div></div>)}</div>
+        </section>
+        <section className="s2-section"><h3 className="s2-section-heading">Landmark releases</h3>
+          <ol className="s2-timeline">{data.landmarks.map((l, i) => <li key={i} className="s2-timeline-item"><div className="s2-timeline-head"><a className="s2-timeline-name" href={l.link} target="_blank" rel="noopener">{l.name}</a><span className="s2-timeline-date">{l.date}</span></div><div className="s2-timeline-note">{l.note}</div></li>)}</ol>
+        </section>
+        <section className="s2-section s2-caveat"><h3 className="s2-section-heading">{data.caveat.heading}</h3><p className="s2-section-body">{data.caveat.body}</p></section>
+      </div>
+    </div>
+  </div>;
 }
 
-// Replace literal text "System 2" in selected containers with clickable triggers
-function injectSystem2Triggers() {
-  const selectors = [
-    "#shifts-target",       // overview macro shifts cards
-    "#timeline-target",     // timeline / paradigm eras
-    "#sota-target",         // model capability table
-    "#milestones-target"    // milestone bullets
-  ];
+// ── Root App ──────────────────────────────────────────────────
+function App() {
+  const [data, setData] = useState(null);
+  const [err, setErr] = useState(null);
+  const [active, setActive] = useState("overview");
+  const [s2Open, setS2Open] = useState(false);
 
-  const triggerHTML = `<button class="s2-trigger" type="button" onclick="openSystem2Modal()" aria-label="Open System 2 explainer"><span class="s2-trigger-icon">i</span>System 2</button>`;
+  useEffect(() => { loadData().then(setData).catch((e) => setErr(e.message)); }, []);
 
-  selectors.forEach(sel => {
-    const root = document.querySelector(sel);
-    if (!root) return;
-    walkAndReplace(root, /\bSystem 2\b/g, triggerHTML);
-  });
+  useEffect(() => {
+    if (!data) return;
+    const obs = new IntersectionObserver((entries) => {
+      entries.forEach((e) => e.isIntersecting && setActive(e.target.id));
+    }, { threshold: 0.15, rootMargin: "-80px 0px -40% 0px" });
+    document.querySelectorAll("section[id]").forEach((s) => obs.observe(s));
+    return () => obs.disconnect();
+  }, [data]);
+
+  const onNav = (e, id) => {
+    e.preventDefault();
+    const sec = document.getElementById(id);
+    if (!sec) return;
+    viewTransition(() => {
+      setActive(id);
+      sec.scrollIntoView({ behavior: "smooth", block: "start" });
+      sec.querySelector(".section-title")?.focus();
+    });
+  };
+
+  const [theme, setTheme] = useTheme();
+  if (err) return <FatalError message="Failed to load data.json." />;
+  if (!data) return <div className="hero"><p>Loading detailed retrospective insights…</p></div>;
+
+  return <S2Ctx.Provider value={() => setS2Open(true)}>
+    <div className="app-container">
+      <Sidebar active={active} onNav={onNav} theme={theme} setTheme={setTheme} />
+      <ThemeToggleMobile theme={theme} setTheme={setTheme} />
+      <main>
+        <Hero data={data} />
+        <Overview shifts={data.macroShifts} />
+        <Timeline data={data} />
+        <Models data={data} />
+        <Stack stack={data.agenticStack} />
+        <Hardware data={data} />
+        <Economics econ={data.economicsSplit} />
+        <Industry ind={data.industryShift} />
+        <Engineers eng={data.engineersUpdate} />
+        <Workforce items={data.deflationaryImpact} />
+        <Legal items={data.legalLitigation} />
+        <Security data={data} />
+        <footer style={{ textAlign: "center", color: "var(--text-faint)", fontSize: "0.75rem", marginTop: "4rem", borderTop: "1px solid var(--border)", paddingTop: "2rem", paddingBottom: "2rem" }}>
+          <p>Strategic Retrospective of Cognitive Systems (2022–2026)</p>
+          <p style={{ marginTop: "0.25rem" }}>Compiled from industry sources. Last updated May 2026.</p>
+        </footer>
+      </main>
+      <System2Modal data={data.system2Explainer} open={s2Open} onClose={() => setS2Open(false)} />
+      <MobileNav active={active} onNav={onNav} />
+    </div>
+  </S2Ctx.Provider>;
 }
 
-// Walk all text nodes and replace pattern with HTML, preserving structure
-function walkAndReplace(root, pattern, replacementHTML) {
-  // Build a non-global tester so .test() doesn't advance lastIndex
-  const testRe = new RegExp(pattern.source, pattern.flags.replace("g", ""));
-
-  const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, {
-    acceptNode: node => {
-      const parent = node.parentElement;
-      if (!parent) return NodeFilter.FILTER_REJECT;
-      if (parent.closest(".s2-trigger, button, a")) return NodeFilter.FILTER_REJECT;
-      if (parent.tagName === "SCRIPT" || parent.tagName === "STYLE") return NodeFilter.FILTER_REJECT;
-      return testRe.test(node.nodeValue) ? NodeFilter.FILTER_ACCEPT : NodeFilter.FILTER_REJECT;
-    }
-  });
-
-  const nodesToReplace = [];
-  let node;
-  while ((node = walker.nextNode())) {
-    nodesToReplace.push(node);
-  }
-
-  nodesToReplace.forEach(textNode => {
-    const text = textNode.nodeValue;
-    const replaceRe = new RegExp(pattern.source, pattern.flags); // fresh regex per replace
-    const html = text.replace(replaceRe, replacementHTML);
-    if (html !== text) {
-      const wrapper = document.createElement("span");
-      wrapper.innerHTML = html;
-      const frag = document.createDocumentFragment();
-      while (wrapper.firstChild) frag.appendChild(wrapper.firstChild);
-      textNode.parentNode.replaceChild(frag, textNode);
-    }
-  });
-}
+ReactDOM.createRoot(document.getElementById('root')).render(<App />);

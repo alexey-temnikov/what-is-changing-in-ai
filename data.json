@@ -294,18 +294,44 @@
       "heading": "Origin: Kahneman's dual-process theory",
       "body": "The terminology comes from cognitive psychology. Nobel laureate Daniel Kahneman popularised it in his 2011 book Thinking, Fast and Slow. The labels 'System 1' and 'System 2' themselves were introduced earlier by psychologists Keith Stanovich and Richard West around 2000, building on decades of work by Kahneman and Amos Tversky on cognitive biases. Kahneman didn't invent the dual-process model — but his book is what made it a household concept.",
       "sources": [
-        { "name": "Thinking, Fast and Slow (2011)", "link": "https://en.wikipedia.org/wiki/Thinking,_Fast_and_Slow" },
-        { "name": "Stanovich & West, 2000", "link": "https://psycnet.apa.org/record/2000-13324-002" }
+        {
+          "name": "Thinking, Fast and Slow (2011)",
+          "link": "https://en.wikipedia.org/wiki/Thinking,_Fast_and_Slow"
+        },
+        {
+          "name": "Stanovich & West, 2000",
+          "link": "https://psycnet.apa.org/record/2000-13324-002"
+        }
       ]
     },
     "comparison": {
       "heading": "The two systems at a glance",
       "rows": [
-        { "axis": "Speed", "s1": "Fast, automatic", "s2": "Slow, effortful" },
-        { "axis": "Style", "s1": "Intuitive, associative, pattern-matching", "s2": "Deliberate, analytical, rule-based" },
-        { "axis": "Cost", "s1": "Cheap — runs constantly", "s2": "Expensive — needs focus" },
-        { "axis": "Examples", "s1": "Recognising a face · '2 + 2'", "s2": "'17 × 24' in your head · parking in a tight space" },
-        { "axis": "Failure mode", "s1": "Cognitive biases, snap judgments", "s2": "Mental fatigue, lazy fall-back to System 1" }
+        {
+          "axis": "Speed",
+          "s1": "Fast, automatic",
+          "s2": "Slow, effortful"
+        },
+        {
+          "axis": "Style",
+          "s1": "Intuitive, associative, pattern-matching",
+          "s2": "Deliberate, analytical, rule-based"
+        },
+        {
+          "axis": "Cost",
+          "s1": "Cheap — runs constantly",
+          "s2": "Expensive — needs focus"
+        },
+        {
+          "axis": "Examples",
+          "s1": "Recognising a face · '2 + 2'",
+          "s2": "'17 × 24' in your head · parking in a tight space"
+        },
+        {
+          "axis": "Failure mode",
+          "s1": "Cognitive biases, snap judgments",
+          "s2": "Mental fatigue, lazy fall-back to System 1"
+        }
       ]
     },
     "aiCrossover": {
@@ -313,8 +339,14 @@
       "body": "By the late 2010s, deep-learning researchers — most prominently Turing-Award winner Yoshua Bengio — borrowed the framing to describe a limitation of large language models. Bengio's influential 2019 NeurIPS keynote, 'From System 1 Deep Learning to System 2 Deep Learning,' made the framing canonical in the field.",
       "argument": "LLMs of that era (GPT-2, GPT-3) were essentially gigantic System 1 machines: fluent, plausible answers from pattern-matching on training data, no internal mechanism to step back and verify, and predictable failure on multi-step logic, planning, or out-of-distribution reasoning. This earned them the dismissive label 'stochastic parrots' (Bender et al., 2021) — a System-1-only mind that mimics fluency but doesn't deliberate.",
       "sources": [
-        { "name": "Bengio NeurIPS 2019 keynote", "link": "https://nips.cc/Conferences/2019/Schedule?showEvent=15488" },
-        { "name": "Stochastic Parrots paper (Bender et al., 2021)", "link": "https://dl.acm.org/doi/10.1145/3442188.3445922" }
+        {
+          "name": "Bengio NeurIPS 2019 keynote",
+          "link": "https://nips.cc/Conferences/2019/Schedule?showEvent=15488"
+        },
+        {
+          "name": "Stochastic Parrots paper (Bender et al., 2021)",
+          "link": "https://dl.acm.org/doi/10.1145/3442188.3445922"
+        }
       ]
     },
     "modernMeaning": [
@@ -628,9 +660,21 @@
       "title": "The Continuous Agent Loop",
       "desc": "Every modern agentic harness — Claude Code, Codex, Cursor, Devin, Goose, Aider — runs the same core cycle: gather context, take action, verify results. The harness mediates each step; the model only chooses the next move.",
       "phases": [
-        { "phase": "Gather", "icon": "🔍", "tools": "Read, Grep, Glob, web fetch, MCP search" },
-        { "phase": "Act", "icon": "⚡", "tools": "Edit, Write, Bash, MCP actions, sub-agent dispatch" },
-        { "phase": "Verify", "icon": "✓", "tools": "Re-run tests, lint, hooks, max_turns / budget guard" }
+        {
+          "phase": "Gather",
+          "icon": "🔍",
+          "tools": "Read, Grep, Glob, web fetch, MCP search"
+        },
+        {
+          "phase": "Act",
+          "icon": "⚡",
+          "tools": "Edit, Write, Bash, MCP actions, sub-agent dispatch"
+        },
+        {
+          "phase": "Verify",
+          "icon": "✓",
+          "tools": "Re-run tests, lint, hooks, max_turns / budget guard"
+        }
       ]
     },
     "protocols": [
@@ -1274,15 +1318,42 @@
       ]
     },
     "resources": [
-      { "label": "METR Productivity RCT", "link": "https://www.fintechbiznews.com/fintech-technology/ai-slows-down-experienced-open-source-developers" },
-      { "label": "Stack Overflow Dev Survey 2025", "link": "https://www.digitalapplied.com/blog/ai-coding-adoption-statistics-2026-50-data-points" },
-      { "label": "Spec-Driven Development Guide", "link": "https://www.edlitera.com/blog/posts/what-is-spec-driven-development" },
-      { "label": "Eval-Driven Development (arXiv)", "link": "https://arxiv.org/html/2411.13768v2" },
-      { "label": "DORA 2025 Report Analysis", "link": "https://devops.com/why-dora-metrics-look-different-when-ai-is-part-of-your-development-workflow/" },
-      { "label": "Prompt Caching Playbook", "link": "https://galileo.ai/blog/the-2026-caching-playbook-for-agents-bigger-prompts-smaller-bills" },
-      { "label": "MCP Server Registry (Glama)", "link": "https://glama.ai/" },
-      { "label": "Claude Code Resource List 2026", "link": "https://www.scriptbyai.com/claude-code-resource-list/" },
-      { "label": "AI Engineer Roadmap 2026", "link": "https://www.birjob.com/blog/ai-engineer-roadmap-2026" }
+      {
+        "label": "METR Productivity RCT",
+        "link": "https://www.fintechbiznews.com/fintech-technology/ai-slows-down-experienced-open-source-developers"
+      },
+      {
+        "label": "Stack Overflow Dev Survey 2025",
+        "link": "https://www.digitalapplied.com/blog/ai-coding-adoption-statistics-2026-50-data-points"
+      },
+      {
+        "label": "Spec-Driven Development Guide",
+        "link": "https://www.edlitera.com/blog/posts/what-is-spec-driven-development"
+      },
+      {
+        "label": "Eval-Driven Development (arXiv)",
+        "link": "https://arxiv.org/html/2411.13768v2"
+      },
+      {
+        "label": "DORA 2025 Report Analysis",
+        "link": "https://devops.com/why-dora-metrics-look-different-when-ai-is-part-of-your-development-workflow/"
+      },
+      {
+        "label": "Prompt Caching Playbook",
+        "link": "https://galileo.ai/blog/the-2026-caching-playbook-for-agents-bigger-prompts-smaller-bills"
+      },
+      {
+        "label": "MCP Server Registry (Glama)",
+        "link": "https://glama.ai/"
+      },
+      {
+        "label": "Claude Code Resource List 2026",
+        "link": "https://www.scriptbyai.com/claude-code-resource-list/"
+      },
+      {
+        "label": "AI Engineer Roadmap 2026",
+        "link": "https://www.birjob.com/blog/ai-engineer-roadmap-2026"
+      }
     ]
   },
   "presenterPlaybook": {
@@ -1312,13 +1383,48 @@
       }
     ],
     "timeAllocation": [
-      { "step": "01", "title": "Set the Table", "minutes": "1 min", "color": "warm" },
-      { "step": "02", "title": "5 Inflection Points", "minutes": "5 min · 1 min each", "color": "primary" },
-      { "step": "03", "title": "Live Demo · Kiro A2A Agent", "minutes": "4 min", "color": "warm" },
-      { "step": "04", "title": "Live Demo · Reasoning Knob", "minutes": "4 min", "color": "warm" },
-      { "step": "05", "title": "Disciplines + Reality Check", "minutes": "4 min", "color": "primary" },
-      { "step": "06", "title": "Two-Week Experiment", "minutes": "2 min · close strong", "color": "primary" },
-      { "step": "Q&A", "title": "Buffer for Q&A (after talk)", "minutes": "5 min", "color": "muted" }
+      {
+        "step": "01",
+        "title": "Set the Table",
+        "minutes": "1 min",
+        "color": "warm"
+      },
+      {
+        "step": "02",
+        "title": "5 Inflection Points",
+        "minutes": "5 min · 1 min each",
+        "color": "primary"
+      },
+      {
+        "step": "03",
+        "title": "Live Demo · Kiro A2A Agent",
+        "minutes": "4 min",
+        "color": "warm"
+      },
+      {
+        "step": "04",
+        "title": "Live Demo · Reasoning Knob",
+        "minutes": "4 min",
+        "color": "warm"
+      },
+      {
+        "step": "05",
+        "title": "Disciplines + Reality Check",
+        "minutes": "4 min",
+        "color": "primary"
+      },
+      {
+        "step": "06",
+        "title": "Two-Week Experiment",
+        "minutes": "2 min · close strong",
+        "color": "primary"
+      },
+      {
+        "step": "Q&A",
+        "title": "Buffer for Q&A (after talk)",
+        "minutes": "5 min",
+        "color": "muted"
+      }
     ],
     "qaPrep": [
       {
@@ -1352,74 +1458,368 @@
     "title": "Show, Don't Tell · Four Working Demos",
     "subtitle": "Don't pre-record. Run these live on stage. Each demo embodies one of the inflection points and works entirely in-browser — no API keys, no network, full responsiveness. Skim the recipe, then click Run.",
     "tabs": [
-      { "id": "agent", "label": "Kiro A2A Agent", "icon": "⚙", "inflection": "Inflection 1 · Shipping Agents" },
-      { "id": "reasoning", "label": "Reasoning Knob", "icon": "◐", "inflection": "Inflection 3 · Reasoning as a Knob" },
-      { "id": "mcp", "label": "MCP Catalog", "icon": "⊞", "inflection": "Inflection 4 · MCP Standardisation" },
-      { "id": "race", "label": "Model Race", "icon": "▶", "inflection": "Inflection 5 · Open-Weight Parity" }
+      {
+        "id": "agent",
+        "label": "Kiro A2A Agent",
+        "icon": "⚙",
+        "inflection": "Inflection 1 · Shipping Agents"
+      },
+      {
+        "id": "reasoning",
+        "label": "Reasoning Knob",
+        "icon": "◐",
+        "inflection": "Inflection 3 · Reasoning as a Knob"
+      },
+      {
+        "id": "mcp",
+        "label": "MCP Catalog",
+        "icon": "⊞",
+        "inflection": "Inflection 4 · MCP Standardisation"
+      },
+      {
+        "id": "race",
+        "label": "Model Race",
+        "icon": "▶",
+        "inflection": "Inflection 5 · Open-Weight Parity"
+      }
     ],
     "agentDemo": {
       "headline": "Watch a multi-agent loop solve a real coding task",
       "blurb": "Kiro CLI's A2A protocol lets one orchestrator spawn specialised sub-agents in parallel. Pick a task and watch the loop: the orchestrator plans, then a researcher reads code, an implementer writes the change, and a reviewer validates. Each pane streams live tool calls.",
       "tasks": [
-        { "id": "api", "label": "Add cursor pagination to /users API", "stack": "Node.js · Express · Postgres" },
-        { "id": "test", "label": "Fix failing JWT auth test", "stack": "Vitest · TypeScript" },
-        { "id": "refactor", "label": "Refactor middleware to async/await", "stack": "Express · Node 20" }
+        {
+          "id": "api",
+          "label": "Add cursor pagination to /users API",
+          "stack": "Node.js · Express · Postgres"
+        },
+        {
+          "id": "test",
+          "label": "Fix failing JWT auth test",
+          "stack": "Vitest · TypeScript"
+        },
+        {
+          "id": "refactor",
+          "label": "Refactor middleware to async/await",
+          "stack": "Express · Node 20"
+        }
       ],
       "scripts": {
         "api": [
-          { "agent": "orch", "kind": "thinking", "text": "Planning: this needs a query layer change, a route handler change, and a return-shape change. Spawning researcher + implementer + reviewer in parallel.", "delay": 700 },
-          { "agent": "orch", "kind": "spawn", "text": "subagent(role: researcher) → reading existing code", "delay": 500 },
-          { "agent": "researcher", "kind": "tool", "tool": "read_file", "args": "src/routes/users.ts", "delay": 600 },
-          { "agent": "researcher", "kind": "result", "text": "127 lines · GET /users returns full table · no LIMIT/OFFSET · no cursor", "delay": 400 },
-          { "agent": "researcher", "kind": "tool", "tool": "grep", "args": "pagination · src/", "delay": 500 },
-          { "agent": "researcher", "kind": "result", "text": "no existing pagination util · 4 other routes also unbounded", "delay": 300 },
-          { "agent": "orch", "kind": "spawn", "text": "subagent(role: implementer) → writing change", "delay": 600 },
-          { "agent": "implementer", "kind": "tool", "tool": "edit_file", "args": "src/routes/users.ts", "delay": 800 },
-          { "agent": "implementer", "kind": "diff", "text": "+ accepts ?cursor= and ?limit= (default 50, max 200)\n+ returns { data, nextCursor }\n+ uses encoded (id, createdAt) cursor", "delay": 500 },
-          { "agent": "implementer", "kind": "tool", "tool": "edit_file", "args": "src/db/users.ts", "delay": 700 },
-          { "agent": "implementer", "kind": "diff", "text": "+ added findUsersAfter(cursor, limit) with WHERE (id, created_at) > (...) ORDER BY id ASC LIMIT $2", "delay": 500 },
-          { "agent": "orch", "kind": "spawn", "text": "subagent(role: reviewer) → validating", "delay": 500 },
-          { "agent": "reviewer", "kind": "tool", "tool": "run_tests", "args": "tests/users.test.ts", "delay": 1000 },
-          { "agent": "reviewer", "kind": "result", "text": "✓ 8 existing tests pass · ✓ 3 new pagination tests pass", "delay": 400 },
-          { "agent": "reviewer", "kind": "tool", "tool": "lint", "args": "src/routes/users.ts", "delay": 500 },
-          { "agent": "reviewer", "kind": "result", "text": "✓ no issues", "delay": 300 },
-          { "agent": "orch", "kind": "done", "text": "Done. 2 files changed · 47 lines added · all tests green. Estimated PR size: small.", "delay": 400 }
+          {
+            "agent": "orch",
+            "kind": "thinking",
+            "text": "Planning: this needs a query layer change, a route handler change, and a return-shape change. Spawning researcher + implementer + reviewer in parallel.",
+            "delay": 700
+          },
+          {
+            "agent": "orch",
+            "kind": "spawn",
+            "text": "subagent(role: researcher) → reading existing code",
+            "delay": 500
+          },
+          {
+            "agent": "researcher",
+            "kind": "tool",
+            "tool": "read_file",
+            "args": "src/routes/users.ts",
+            "delay": 600
+          },
+          {
+            "agent": "researcher",
+            "kind": "result",
+            "text": "127 lines · GET /users returns full table · no LIMIT/OFFSET · no cursor",
+            "delay": 400
+          },
+          {
+            "agent": "researcher",
+            "kind": "tool",
+            "tool": "grep",
+            "args": "pagination · src/",
+            "delay": 500
+          },
+          {
+            "agent": "researcher",
+            "kind": "result",
+            "text": "no existing pagination util · 4 other routes also unbounded",
+            "delay": 300
+          },
+          {
+            "agent": "orch",
+            "kind": "spawn",
+            "text": "subagent(role: implementer) → writing change",
+            "delay": 600
+          },
+          {
+            "agent": "implementer",
+            "kind": "tool",
+            "tool": "edit_file",
+            "args": "src/routes/users.ts",
+            "delay": 800
+          },
+          {
+            "agent": "implementer",
+            "kind": "diff",
+            "text": "+ accepts ?cursor= and ?limit= (default 50, max 200)\n+ returns { data, nextCursor }\n+ uses encoded (id, createdAt) cursor",
+            "delay": 500
+          },
+          {
+            "agent": "implementer",
+            "kind": "tool",
+            "tool": "edit_file",
+            "args": "src/db/users.ts",
+            "delay": 700
+          },
+          {
+            "agent": "implementer",
+            "kind": "diff",
+            "text": "+ added findUsersAfter(cursor, limit) with WHERE (id, created_at) > (...) ORDER BY id ASC LIMIT $2",
+            "delay": 500
+          },
+          {
+            "agent": "orch",
+            "kind": "spawn",
+            "text": "subagent(role: reviewer) → validating",
+            "delay": 500
+          },
+          {
+            "agent": "reviewer",
+            "kind": "tool",
+            "tool": "run_tests",
+            "args": "tests/users.test.ts",
+            "delay": 1000
+          },
+          {
+            "agent": "reviewer",
+            "kind": "result",
+            "text": "✓ 8 existing tests pass · ✓ 3 new pagination tests pass",
+            "delay": 400
+          },
+          {
+            "agent": "reviewer",
+            "kind": "tool",
+            "tool": "lint",
+            "args": "src/routes/users.ts",
+            "delay": 500
+          },
+          {
+            "agent": "reviewer",
+            "kind": "result",
+            "text": "✓ no issues",
+            "delay": 300
+          },
+          {
+            "agent": "orch",
+            "kind": "done",
+            "text": "Done. 2 files changed · 47 lines added · all tests green. Estimated PR size: small.",
+            "delay": 400
+          }
         ],
         "test": [
-          { "agent": "orch", "kind": "thinking", "text": "Test failure first. Read the test, read the code under test, find the divergence.", "delay": 700 },
-          { "agent": "orch", "kind": "spawn", "text": "subagent(role: researcher) → diagnosing", "delay": 500 },
-          { "agent": "researcher", "kind": "tool", "tool": "run_tests", "args": "tests/auth.test.ts", "delay": 900 },
-          { "agent": "researcher", "kind": "result", "text": "✗ verifies expired token · expected 401, got 200", "delay": 400 },
-          { "agent": "researcher", "kind": "tool", "tool": "read_file", "args": "src/middleware/auth.ts", "delay": 500 },
-          { "agent": "researcher", "kind": "result", "text": "issue: jwt.verify is wrapped in try/catch but the catch resolves with req.user = null instead of throwing", "delay": 600 },
-          { "agent": "researcher", "kind": "tool", "tool": "read_file", "args": "src/routes/handlers.ts", "delay": 400 },
-          { "agent": "researcher", "kind": "result", "text": "handlers do not check req.user for null — they just access req.user.id", "delay": 400 },
-          { "agent": "orch", "kind": "spawn", "text": "subagent(role: implementer) → patching", "delay": 500 },
-          { "agent": "implementer", "kind": "tool", "tool": "edit_file", "args": "src/middleware/auth.ts", "delay": 700 },
-          { "agent": "implementer", "kind": "diff", "text": "+ catch (e) { res.status(401).json({ error: 'invalid token' }); return; }\n- catch (e) { req.user = null; next(); }", "delay": 400 },
-          { "agent": "orch", "kind": "spawn", "text": "subagent(role: reviewer) → re-running tests", "delay": 400 },
-          { "agent": "reviewer", "kind": "tool", "tool": "run_tests", "args": "tests/auth.test.ts", "delay": 1000 },
-          { "agent": "reviewer", "kind": "result", "text": "✓ all 12 auth tests pass", "delay": 400 },
-          { "agent": "reviewer", "kind": "tool", "tool": "run_tests", "args": "tests/", "delay": 1100 },
-          { "agent": "reviewer", "kind": "result", "text": "✓ full suite green · no regressions", "delay": 400 },
-          { "agent": "orch", "kind": "done", "text": "Done. 1 file changed · root cause was an over-permissive catch block. Reviewer validated full suite.", "delay": 400 }
+          {
+            "agent": "orch",
+            "kind": "thinking",
+            "text": "Test failure first. Read the test, read the code under test, find the divergence.",
+            "delay": 700
+          },
+          {
+            "agent": "orch",
+            "kind": "spawn",
+            "text": "subagent(role: researcher) → diagnosing",
+            "delay": 500
+          },
+          {
+            "agent": "researcher",
+            "kind": "tool",
+            "tool": "run_tests",
+            "args": "tests/auth.test.ts",
+            "delay": 900
+          },
+          {
+            "agent": "researcher",
+            "kind": "result",
+            "text": "✗ verifies expired token · expected 401, got 200",
+            "delay": 400
+          },
+          {
+            "agent": "researcher",
+            "kind": "tool",
+            "tool": "read_file",
+            "args": "src/middleware/auth.ts",
+            "delay": 500
+          },
+          {
+            "agent": "researcher",
+            "kind": "result",
+            "text": "issue: jwt.verify is wrapped in try/catch but the catch resolves with req.user = null instead of throwing",
+            "delay": 600
+          },
+          {
+            "agent": "researcher",
+            "kind": "tool",
+            "tool": "read_file",
+            "args": "src/routes/handlers.ts",
+            "delay": 400
+          },
+          {
+            "agent": "researcher",
+            "kind": "result",
+            "text": "handlers do not check req.user for null — they just access req.user.id",
+            "delay": 400
+          },
+          {
+            "agent": "orch",
+            "kind": "spawn",
+            "text": "subagent(role: implementer) → patching",
+            "delay": 500
+          },
+          {
+            "agent": "implementer",
+            "kind": "tool",
+            "tool": "edit_file",
+            "args": "src/middleware/auth.ts",
+            "delay": 700
+          },
+          {
+            "agent": "implementer",
+            "kind": "diff",
+            "text": "+ catch (e) { res.status(401).json({ error: 'invalid token' }); return; }\n- catch (e) { req.user = null; next(); }",
+            "delay": 400
+          },
+          {
+            "agent": "orch",
+            "kind": "spawn",
+            "text": "subagent(role: reviewer) → re-running tests",
+            "delay": 400
+          },
+          {
+            "agent": "reviewer",
+            "kind": "tool",
+            "tool": "run_tests",
+            "args": "tests/auth.test.ts",
+            "delay": 1000
+          },
+          {
+            "agent": "reviewer",
+            "kind": "result",
+            "text": "✓ all 12 auth tests pass",
+            "delay": 400
+          },
+          {
+            "agent": "reviewer",
+            "kind": "tool",
+            "tool": "run_tests",
+            "args": "tests/",
+            "delay": 1100
+          },
+          {
+            "agent": "reviewer",
+            "kind": "result",
+            "text": "✓ full suite green · no regressions",
+            "delay": 400
+          },
+          {
+            "agent": "orch",
+            "kind": "done",
+            "text": "Done. 1 file changed · root cause was an over-permissive catch block. Reviewer validated full suite.",
+            "delay": 400
+          }
         ],
         "refactor": [
-          { "agent": "orch", "kind": "thinking", "text": "Refactor task. Need to map all callback usages, then rewrite, then verify behavior is preserved by tests.", "delay": 700 },
-          { "agent": "orch", "kind": "spawn", "text": "subagent(role: researcher) → mapping callbacks", "delay": 500 },
-          { "agent": "researcher", "kind": "tool", "tool": "grep", "args": "(req,\\s*res,\\s*next) · src/middleware/", "delay": 600 },
-          { "agent": "researcher", "kind": "result", "text": "found 7 middleware files · 4 use callbacks · 3 already async", "delay": 400 },
-          { "agent": "researcher", "kind": "tool", "tool": "read_file", "args": "src/middleware/auth.ts", "delay": 500 },
-          { "agent": "researcher", "kind": "result", "text": "uses jwt.verify(token, secret, (err, decoded) => …) · candidate for util.promisify", "delay": 400 },
-          { "agent": "orch", "kind": "spawn", "text": "subagent(role: implementer) → rewriting", "delay": 600 },
-          { "agent": "implementer", "kind": "tool", "tool": "edit_file", "args": "src/middleware/auth.ts", "delay": 800 },
-          { "agent": "implementer", "kind": "diff", "text": "- jwt.verify(token, secret, (err, decoded) => { … })\n+ const decoded = await promisify(jwt.verify)(token, secret);\n+ wrapped in async middleware with try/catch + next(err)", "delay": 500 },
-          { "agent": "orch", "kind": "spawn", "text": "subagent(role: reviewer) → checking behavior", "delay": 400 },
-          { "agent": "reviewer", "kind": "tool", "tool": "run_tests", "args": "tests/middleware/", "delay": 1000 },
-          { "agent": "reviewer", "kind": "result", "text": "✓ 18/18 pass · timing identical (±2ms)", "delay": 400 },
-          { "agent": "reviewer", "kind": "tool", "tool": "lint", "args": "src/middleware/", "delay": 400 },
-          { "agent": "reviewer", "kind": "result", "text": "✓ no issues", "delay": 300 },
-          { "agent": "orch", "kind": "done", "text": "Done. 1 file refactored. Behaviour-equivalent — tests pass, no perf regression.", "delay": 400 }
+          {
+            "agent": "orch",
+            "kind": "thinking",
+            "text": "Refactor task. Need to map all callback usages, then rewrite, then verify behavior is preserved by tests.",
+            "delay": 700
+          },
+          {
+            "agent": "orch",
+            "kind": "spawn",
+            "text": "subagent(role: researcher) → mapping callbacks",
+            "delay": 500
+          },
+          {
+            "agent": "researcher",
+            "kind": "tool",
+            "tool": "grep",
+            "args": "(req,\\s*res,\\s*next) · src/middleware/",
+            "delay": 600
+          },
+          {
+            "agent": "researcher",
+            "kind": "result",
+            "text": "found 7 middleware files · 4 use callbacks · 3 already async",
+            "delay": 400
+          },
+          {
+            "agent": "researcher",
+            "kind": "tool",
+            "tool": "read_file",
+            "args": "src/middleware/auth.ts",
+            "delay": 500
+          },
+          {
+            "agent": "researcher",
+            "kind": "result",
+            "text": "uses jwt.verify(token, secret, (err, decoded) => …) · candidate for util.promisify",
+            "delay": 400
+          },
+          {
+            "agent": "orch",
+            "kind": "spawn",
+            "text": "subagent(role: implementer) → rewriting",
+            "delay": 600
+          },
+          {
+            "agent": "implementer",
+            "kind": "tool",
+            "tool": "edit_file",
+            "args": "src/middleware/auth.ts",
+            "delay": 800
+          },
+          {
+            "agent": "implementer",
+            "kind": "diff",
+            "text": "- jwt.verify(token, secret, (err, decoded) => { … })\n+ const decoded = await promisify(jwt.verify)(token, secret);\n+ wrapped in async middleware with try/catch + next(err)",
+            "delay": 500
+          },
+          {
+            "agent": "orch",
+            "kind": "spawn",
+            "text": "subagent(role: reviewer) → checking behavior",
+            "delay": 400
+          },
+          {
+            "agent": "reviewer",
+            "kind": "tool",
+            "tool": "run_tests",
+            "args": "tests/middleware/",
+            "delay": 1000
+          },
+          {
+            "agent": "reviewer",
+            "kind": "result",
+            "text": "✓ 18/18 pass · timing identical (±2ms)",
+            "delay": 400
+          },
+          {
+            "agent": "reviewer",
+            "kind": "tool",
+            "tool": "lint",
+            "args": "src/middleware/",
+            "delay": 400
+          },
+          {
+            "agent": "reviewer",
+            "kind": "result",
+            "text": "✓ no issues",
+            "delay": 300
+          },
+          {
+            "agent": "orch",
+            "kind": "done",
+            "text": "Done. 1 file refactored. Behaviour-equivalent — tests pass, no perf regression.",
+            "delay": 400
+          }
         ]
       }
     },
@@ -1486,81 +1886,359 @@
       "blurb": "MCP became the universal language for connecting agents to tools in 2025–26. The MCP Toplist registry tracks 54,450 servers as of May 2026. Search, filter, and click to attach tools — watch the agent's context size and tool count update live.",
       "registrySize": 54450,
       "categories": [
-        { "id": "all", "label": "All" },
-        { "id": "fs", "label": "Filesystem" },
-        { "id": "git", "label": "Git" },
-        { "id": "browser", "label": "Browser" },
-        { "id": "data", "label": "Database" },
-        { "id": "cloud", "label": "Cloud" },
-        { "id": "obs", "label": "Observability" },
-        { "id": "design", "label": "Design" },
-        { "id": "comms", "label": "Comms" }
+        {
+          "id": "all",
+          "label": "All"
+        },
+        {
+          "id": "fs",
+          "label": "Filesystem"
+        },
+        {
+          "id": "git",
+          "label": "Git"
+        },
+        {
+          "id": "browser",
+          "label": "Browser"
+        },
+        {
+          "id": "data",
+          "label": "Database"
+        },
+        {
+          "id": "cloud",
+          "label": "Cloud"
+        },
+        {
+          "id": "obs",
+          "label": "Observability"
+        },
+        {
+          "id": "design",
+          "label": "Design"
+        },
+        {
+          "id": "comms",
+          "label": "Comms"
+        }
       ],
       "servers": [
-        { "id": "fs",        "name": "filesystem",       "category": "fs",      "tools": 6,  "ctx": 4200,  "desc": "Read, write, search files within sandboxed roots." },
-        { "id": "git",       "name": "git",              "category": "git",     "tools": 22, "ctx": 9800,  "desc": "Repo operations: log, diff, blame, branch, status." },
-        { "id": "github",    "name": "github",           "category": "git",     "tools": 41, "ctx": 18000, "desc": "PRs, issues, releases, code search across GitHub." },
-        { "id": "gitlab",    "name": "gitlab",           "category": "git",     "tools": 28, "ctx": 11000, "desc": "GitLab MRs, pipelines, registry, runners." },
-        { "id": "playw",     "name": "playwright",       "category": "browser", "tools": 32, "ctx": 12500, "desc": "Headless browser: navigate, click, snapshot, scrape." },
-        { "id": "chrome",    "name": "chrome-devtools",  "category": "browser", "tools": 38, "ctx": 14000, "desc": "Live Chrome session: trace, lighthouse, network." },
-        { "id": "pg",        "name": "postgres",         "category": "data",    "tools": 8,  "ctx": 5400,  "desc": "Query, schema introspection, EXPLAIN ANALYZE." },
-        { "id": "mongo",     "name": "mongodb",          "category": "data",    "tools": 11, "ctx": 6200,  "desc": "Documents, aggregations, indexes." },
-        { "id": "redis",     "name": "redis",            "category": "data",    "tools": 9,  "ctx": 4100,  "desc": "Keys, streams, pub/sub, scripting." },
-        { "id": "snow",      "name": "snowflake",        "category": "data",    "tools": 14, "ctx": 7500,  "desc": "Warehouses, queries, data shares." },
-        { "id": "aws",       "name": "aws-cli",          "category": "cloud",   "tools": 87, "ctx": 32000, "desc": "EC2, S3, Lambda, CloudWatch, IAM, RDS, …" },
-        { "id": "gcp",       "name": "gcp-cli",          "category": "cloud",   "tools": 64, "ctx": 25000, "desc": "Compute, storage, BigQuery, Cloud Run." },
-        { "id": "k8s",       "name": "kubernetes",       "category": "cloud",   "tools": 26, "ctx": 11500, "desc": "Pods, deploys, logs, kubectl exec." },
-        { "id": "tf",        "name": "terraform",        "category": "cloud",   "tools": 12, "ctx": 6800,  "desc": "Plan, apply, state, drift detection." },
-        { "id": "dd",        "name": "datadog",          "category": "obs",     "tools": 31, "ctx": 13500, "desc": "Metrics, logs, monitors, dashboards, traces." },
-        { "id": "sentry",    "name": "sentry",           "category": "obs",     "tools": 18, "ctx": 8200,  "desc": "Issues, events, alerts, performance." },
-        { "id": "grafana",   "name": "grafana",          "category": "obs",     "tools": 22, "ctx": 9700,  "desc": "Dashboards, queries, alerts." },
-        { "id": "linear",    "name": "linear",           "category": "comms",   "tools": 19, "ctx": 8400,  "desc": "Issues, projects, cycles, comments." },
-        { "id": "slack",     "name": "slack",            "category": "comms",   "tools": 24, "ctx": 9900,  "desc": "Send, search, threads, channels, users." },
-        { "id": "notion",    "name": "notion",           "category": "comms",   "tools": 26, "ctx": 10500, "desc": "Pages, databases, comments, properties." },
-        { "id": "jira",      "name": "jira",             "category": "comms",   "tools": 33, "ctx": 13200, "desc": "Issues, sprints, JQL, boards, workflows." },
-        { "id": "figma",     "name": "figma",            "category": "design",  "tools": 15, "ctx": 7800,  "desc": "Files, variables, components, comments." },
-        { "id": "fs-mem",    "name": "memory-store",     "category": "fs",      "tools": 4,  "ctx": 2800,  "desc": "Persistent key-value memory across sessions." },
-        { "id": "fetch",     "name": "fetch",            "category": "browser", "tools": 3,  "ctx": 1900,  "desc": "HTTP GET/POST with timeout + body parsing." },
-        { "id": "search",    "name": "web-search",       "category": "browser", "tools": 2,  "ctx": 1400,  "desc": "Search the web. Returns ranked results." },
-        { "id": "email",     "name": "outlook",          "category": "comms",   "tools": 21, "ctx": 9100,  "desc": "Read, send, search, schedule meetings." },
-        { "id": "shell",     "name": "shell",            "category": "fs",      "tools": 2,  "ctx": 1200,  "desc": "Execute shell commands in a sandboxed cwd." },
-        { "id": "docker",    "name": "docker",           "category": "cloud",   "tools": 17, "ctx": 7500,  "desc": "Containers, images, compose, logs." },
-        { "id": "stripe",    "name": "stripe",           "category": "data",    "tools": 35, "ctx": 14500, "desc": "Customers, subscriptions, invoices, refunds." },
-        { "id": "vercel",    "name": "vercel",           "category": "cloud",   "tools": 13, "ctx": 6400,  "desc": "Deployments, domains, env vars, analytics." }
+        {
+          "id": "fs",
+          "name": "filesystem",
+          "category": "fs",
+          "tools": 6,
+          "ctx": 4200,
+          "desc": "Read, write, search files within sandboxed roots."
+        },
+        {
+          "id": "git",
+          "name": "git",
+          "category": "git",
+          "tools": 22,
+          "ctx": 9800,
+          "desc": "Repo operations: log, diff, blame, branch, status."
+        },
+        {
+          "id": "github",
+          "name": "github",
+          "category": "git",
+          "tools": 41,
+          "ctx": 18000,
+          "desc": "PRs, issues, releases, code search across GitHub."
+        },
+        {
+          "id": "gitlab",
+          "name": "gitlab",
+          "category": "git",
+          "tools": 28,
+          "ctx": 11000,
+          "desc": "GitLab MRs, pipelines, registry, runners."
+        },
+        {
+          "id": "playw",
+          "name": "playwright",
+          "category": "browser",
+          "tools": 32,
+          "ctx": 12500,
+          "desc": "Headless browser: navigate, click, snapshot, scrape."
+        },
+        {
+          "id": "chrome",
+          "name": "chrome-devtools",
+          "category": "browser",
+          "tools": 38,
+          "ctx": 14000,
+          "desc": "Live Chrome session: trace, lighthouse, network."
+        },
+        {
+          "id": "pg",
+          "name": "postgres",
+          "category": "data",
+          "tools": 8,
+          "ctx": 5400,
+          "desc": "Query, schema introspection, EXPLAIN ANALYZE."
+        },
+        {
+          "id": "mongo",
+          "name": "mongodb",
+          "category": "data",
+          "tools": 11,
+          "ctx": 6200,
+          "desc": "Documents, aggregations, indexes."
+        },
+        {
+          "id": "redis",
+          "name": "redis",
+          "category": "data",
+          "tools": 9,
+          "ctx": 4100,
+          "desc": "Keys, streams, pub/sub, scripting."
+        },
+        {
+          "id": "snow",
+          "name": "snowflake",
+          "category": "data",
+          "tools": 14,
+          "ctx": 7500,
+          "desc": "Warehouses, queries, data shares."
+        },
+        {
+          "id": "aws",
+          "name": "aws-cli",
+          "category": "cloud",
+          "tools": 87,
+          "ctx": 32000,
+          "desc": "EC2, S3, Lambda, CloudWatch, IAM, RDS, …"
+        },
+        {
+          "id": "gcp",
+          "name": "gcp-cli",
+          "category": "cloud",
+          "tools": 64,
+          "ctx": 25000,
+          "desc": "Compute, storage, BigQuery, Cloud Run."
+        },
+        {
+          "id": "k8s",
+          "name": "kubernetes",
+          "category": "cloud",
+          "tools": 26,
+          "ctx": 11500,
+          "desc": "Pods, deploys, logs, kubectl exec."
+        },
+        {
+          "id": "tf",
+          "name": "terraform",
+          "category": "cloud",
+          "tools": 12,
+          "ctx": 6800,
+          "desc": "Plan, apply, state, drift detection."
+        },
+        {
+          "id": "dd",
+          "name": "datadog",
+          "category": "obs",
+          "tools": 31,
+          "ctx": 13500,
+          "desc": "Metrics, logs, monitors, dashboards, traces."
+        },
+        {
+          "id": "sentry",
+          "name": "sentry",
+          "category": "obs",
+          "tools": 18,
+          "ctx": 8200,
+          "desc": "Issues, events, alerts, performance."
+        },
+        {
+          "id": "grafana",
+          "name": "grafana",
+          "category": "obs",
+          "tools": 22,
+          "ctx": 9700,
+          "desc": "Dashboards, queries, alerts."
+        },
+        {
+          "id": "linear",
+          "name": "linear",
+          "category": "comms",
+          "tools": 19,
+          "ctx": 8400,
+          "desc": "Issues, projects, cycles, comments."
+        },
+        {
+          "id": "slack",
+          "name": "slack",
+          "category": "comms",
+          "tools": 24,
+          "ctx": 9900,
+          "desc": "Send, search, threads, channels, users."
+        },
+        {
+          "id": "notion",
+          "name": "notion",
+          "category": "comms",
+          "tools": 26,
+          "ctx": 10500,
+          "desc": "Pages, databases, comments, properties."
+        },
+        {
+          "id": "jira",
+          "name": "jira",
+          "category": "comms",
+          "tools": 33,
+          "ctx": 13200,
+          "desc": "Issues, sprints, JQL, boards, workflows."
+        },
+        {
+          "id": "figma",
+          "name": "figma",
+          "category": "design",
+          "tools": 15,
+          "ctx": 7800,
+          "desc": "Files, variables, components, comments."
+        },
+        {
+          "id": "fs-mem",
+          "name": "memory-store",
+          "category": "fs",
+          "tools": 4,
+          "ctx": 2800,
+          "desc": "Persistent key-value memory across sessions."
+        },
+        {
+          "id": "fetch",
+          "name": "fetch",
+          "category": "browser",
+          "tools": 3,
+          "ctx": 1900,
+          "desc": "HTTP GET/POST with timeout + body parsing."
+        },
+        {
+          "id": "search",
+          "name": "web-search",
+          "category": "browser",
+          "tools": 2,
+          "ctx": 1400,
+          "desc": "Search the web. Returns ranked results."
+        },
+        {
+          "id": "email",
+          "name": "outlook",
+          "category": "comms",
+          "tools": 21,
+          "ctx": 9100,
+          "desc": "Read, send, search, schedule meetings."
+        },
+        {
+          "id": "shell",
+          "name": "shell",
+          "category": "fs",
+          "tools": 2,
+          "ctx": 1200,
+          "desc": "Execute shell commands in a sandboxed cwd."
+        },
+        {
+          "id": "docker",
+          "name": "docker",
+          "category": "cloud",
+          "tools": 17,
+          "ctx": 7500,
+          "desc": "Containers, images, compose, logs."
+        },
+        {
+          "id": "stripe",
+          "name": "stripe",
+          "category": "data",
+          "tools": 35,
+          "ctx": 14500,
+          "desc": "Customers, subscriptions, invoices, refunds."
+        },
+        {
+          "id": "vercel",
+          "name": "vercel",
+          "category": "cloud",
+          "tools": 13,
+          "ctx": 6400,
+          "desc": "Deployments, domains, env vars, analytics."
+        }
       ]
     },
     "raceDemo": {
       "headline": "Same prompt · four models · live race",
       "blurb": "Open-weight parity, visualised. Two closed-source frontier models race two open-weight models on the same prompt. Watch tokens-per-second, total time, and cost. The gap closed in 2026 — quality is now within margin of error; cost is what differentiates.",
       "prompts": [
-        { "id": "fizz", "label": "Write FizzBuzz in Rust" },
-        { "id": "rbac", "label": "Explain role-based access control" },
-        { "id": "schema", "label": "Generate a JSON schema for a user profile" }
+        {
+          "id": "fizz",
+          "label": "Write FizzBuzz in Rust"
+        },
+        {
+          "id": "rbac",
+          "label": "Explain role-based access control"
+        },
+        {
+          "id": "schema",
+          "label": "Generate a JSON schema for a user profile"
+        }
       ],
       "models": [
-        { "id": "gpt55",   "name": "GPT-5.5",            "kind": "closed", "provider": "OpenAI",   "tps": 142, "costPerM": 8.50,  "lane": "closed-a" },
-        { "id": "claude",  "name": "Claude Opus 4.7",    "kind": "closed", "provider": "Anthropic","tps": 124, "costPerM": 15.00, "lane": "closed-b" },
-        { "id": "ds",      "name": "DeepSeek V4 Pro Max","kind": "open",   "provider": "DeepSeek", "tps": 168, "costPerM": 0.84,  "lane": "open-a" },
-        { "id": "llama",   "name": "Llama 4 Scout",      "kind": "open",   "provider": "Meta",     "tps": 188, "costPerM": 0.40,  "lane": "open-b" }
+        {
+          "id": "gpt55",
+          "name": "GPT-5.5",
+          "kind": "closed",
+          "provider": "OpenAI",
+          "tps": 142,
+          "costPerM": 8.5,
+          "lane": "closed-a"
+        },
+        {
+          "id": "claude",
+          "name": "Claude Opus 4.7",
+          "kind": "closed",
+          "provider": "Anthropic",
+          "tps": 124,
+          "costPerM": 15,
+          "lane": "closed-b"
+        },
+        {
+          "id": "ds",
+          "name": "DeepSeek V4 Pro Max",
+          "kind": "open",
+          "provider": "DeepSeek",
+          "tps": 168,
+          "costPerM": 0.84,
+          "lane": "open-a"
+        },
+        {
+          "id": "llama",
+          "name": "Llama 4 Scout",
+          "kind": "open",
+          "provider": "Meta",
+          "tps": 188,
+          "costPerM": 0.4,
+          "lane": "open-b"
+        }
       ],
       "responses": {
         "fizz": {
-          "gpt55":  "fn fizzbuzz(n: u32) {\n    for i in 1..=n {\n        match (i % 3, i % 5) {\n            (0, 0) => println!(\"FizzBuzz\"),\n            (0, _) => println!(\"Fizz\"),\n            (_, 0) => println!(\"Buzz\"),\n            (_, _) => println!(\"{i}\"),\n        }\n    }\n}\n\nfn main() { fizzbuzz(100); }",
+          "gpt55": "fn fizzbuzz(n: u32) {\n    for i in 1..=n {\n        match (i % 3, i % 5) {\n            (0, 0) => println!(\"FizzBuzz\"),\n            (0, _) => println!(\"Fizz\"),\n            (_, 0) => println!(\"Buzz\"),\n            (_, _) => println!(\"{i}\"),\n        }\n    }\n}\n\nfn main() { fizzbuzz(100); }",
           "claude": "fn main() {\n    (1..=100).for_each(|n| {\n        let s = match (n % 3 == 0, n % 5 == 0) {\n            (true, true)  => \"FizzBuzz\".to_string(),\n            (true, false) => \"Fizz\".to_string(),\n            (false, true) => \"Buzz\".to_string(),\n            _              => n.to_string(),\n        };\n        println!(\"{s}\");\n    });\n}",
-          "ds":     "fn main() {\n    for i in 1..=100 {\n        let out = match (i % 3, i % 5) {\n            (0, 0) => \"FizzBuzz\".into(),\n            (0, _) => \"Fizz\".into(),\n            (_, 0) => \"Buzz\".into(),\n            (_, _) => i.to_string(),\n        };\n        println!(\"{out}\");\n    }\n}",
-          "llama":  "fn main() {\n    for i in 1..=100 {\n        match (i % 3, i % 5) {\n            (0, 0) => println!(\"FizzBuzz\"),\n            (0, _) => println!(\"Fizz\"),\n            (_, 0) => println!(\"Buzz\"),\n            _      => println!(\"{}\", i),\n        }\n    }\n}"
+          "ds": "fn main() {\n    for i in 1..=100 {\n        let out = match (i % 3, i % 5) {\n            (0, 0) => \"FizzBuzz\".into(),\n            (0, _) => \"Fizz\".into(),\n            (_, 0) => \"Buzz\".into(),\n            (_, _) => i.to_string(),\n        };\n        println!(\"{out}\");\n    }\n}",
+          "llama": "fn main() {\n    for i in 1..=100 {\n        match (i % 3, i % 5) {\n            (0, 0) => println!(\"FizzBuzz\"),\n            (0, _) => println!(\"Fizz\"),\n            (_, 0) => println!(\"Buzz\"),\n            _      => println!(\"{}\", i),\n        }\n    }\n}"
         },
         "rbac": {
-          "gpt55":  "Role-based access control (RBAC) maps users → roles → permissions. A user gains capabilities only via roles, never directly. Three pieces: (1) roles are named groups of permissions; (2) permissions are atomic verbs over resources, e.g. invoice:read, invoice:approve; (3) bindings attach roles to users (or groups). Authorization checks ask: does this user have a role with permission X on resource Y? RBAC's strength is auditability — change a role, all its members update. Its weakness is role explosion when fine-grained access is needed.",
+          "gpt55": "Role-based access control (RBAC) maps users → roles → permissions. A user gains capabilities only via roles, never directly. Three pieces: (1) roles are named groups of permissions; (2) permissions are atomic verbs over resources, e.g. invoice:read, invoice:approve; (3) bindings attach roles to users (or groups). Authorization checks ask: does this user have a role with permission X on resource Y? RBAC's strength is auditability — change a role, all its members update. Its weakness is role explosion when fine-grained access is needed.",
           "claude": "RBAC is an authorization model where permissions attach to roles, not users. Users get capabilities by being assigned roles. Three layers:\n\n• Permissions — atomic actions on resources (read:invoice, delete:user)\n• Roles — named bundles of permissions (Editor, Admin, Auditor)\n• Bindings — which users (or groups) hold which roles\n\nAuthorization at request time: does the requester hold any role granting this permission on this resource? Benefits: easy to audit, easy to reason about. Limits: scales poorly when access depends on resource attributes — that's when teams reach for ABAC or ReBAC.",
-          "ds":     "RBAC = Role-Based Access Control. Authorization scheme that decouples users from permissions through an intermediate concept (roles).\n\nElements:\n  permission ::= verb on resource type (e.g. read:order)\n  role       ::= set of permissions\n  user       ::= zero or more role assignments\n  policy     ::= grants role on resource scope\n\nDecision: user can perform action A on resource R iff user has role with permission(A,type(R)) and binding scope covers R.\n\nWidely used in Kubernetes, AWS IAM (with ABAC overlays), enterprise SaaS.",
-          "llama":  "Role-Based Access Control: users get permissions through roles, not directly.\n\nThree concepts:\n  1. Permission: an atomic action (e.g. 'edit document')\n  2. Role: a set of permissions (e.g. 'editor' = read + edit)\n  3. User: assigned one or more roles\n\nWhen a user tries something, the system checks if any of their roles grants that permission. RBAC is widely supported, easy to audit, scales well for stable hierarchies. For dynamic per-resource rules, attribute-based (ABAC) is more flexible but harder to audit."
+          "ds": "RBAC = Role-Based Access Control. Authorization scheme that decouples users from permissions through an intermediate concept (roles).\n\nElements:\n  permission ::= verb on resource type (e.g. read:order)\n  role       ::= set of permissions\n  user       ::= zero or more role assignments\n  policy     ::= grants role on resource scope\n\nDecision: user can perform action A on resource R iff user has role with permission(A,type(R)) and binding scope covers R.\n\nWidely used in Kubernetes, AWS IAM (with ABAC overlays), enterprise SaaS.",
+          "llama": "Role-Based Access Control: users get permissions through roles, not directly.\n\nThree concepts:\n  1. Permission: an atomic action (e.g. 'edit document')\n  2. Role: a set of permissions (e.g. 'editor' = read + edit)\n  3. User: assigned one or more roles\n\nWhen a user tries something, the system checks if any of their roles grants that permission. RBAC is widely supported, easy to audit, scales well for stable hierarchies. For dynamic per-resource rules, attribute-based (ABAC) is more flexible but harder to audit."
         },
         "schema": {
-          "gpt55":  "{\n  \"$schema\": \"https://json-schema.org/draft/2020-12/schema\",\n  \"title\": \"UserProfile\",\n  \"type\": \"object\",\n  \"required\": [\"id\", \"email\", \"createdAt\"],\n  \"properties\": {\n    \"id\":        { \"type\": \"string\", \"format\": \"uuid\" },\n    \"email\":     { \"type\": \"string\", \"format\": \"email\" },\n    \"name\":      { \"type\": \"string\", \"minLength\": 1, \"maxLength\": 200 },\n    \"createdAt\": { \"type\": \"string\", \"format\": \"date-time\" },\n    \"verified\":  { \"type\": \"boolean\", \"default\": false }\n  },\n  \"additionalProperties\": false\n}",
+          "gpt55": "{\n  \"$schema\": \"https://json-schema.org/draft/2020-12/schema\",\n  \"title\": \"UserProfile\",\n  \"type\": \"object\",\n  \"required\": [\"id\", \"email\", \"createdAt\"],\n  \"properties\": {\n    \"id\":        { \"type\": \"string\", \"format\": \"uuid\" },\n    \"email\":     { \"type\": \"string\", \"format\": \"email\" },\n    \"name\":      { \"type\": \"string\", \"minLength\": 1, \"maxLength\": 200 },\n    \"createdAt\": { \"type\": \"string\", \"format\": \"date-time\" },\n    \"verified\":  { \"type\": \"boolean\", \"default\": false }\n  },\n  \"additionalProperties\": false\n}",
           "claude": "{\n  \"$schema\": \"https://json-schema.org/draft/2020-12/schema\",\n  \"$id\":     \"https://example.com/schemas/user-profile.json\",\n  \"title\":   \"UserProfile\",\n  \"type\":    \"object\",\n  \"required\": [\"id\", \"email\"],\n  \"properties\": {\n    \"id\":          { \"type\": \"string\", \"format\": \"uuid\" },\n    \"email\":       { \"type\": \"string\", \"format\": \"email\", \"maxLength\": 254 },\n    \"displayName\": { \"type\": \"string\", \"minLength\": 1, \"maxLength\": 80 },\n    \"avatarUrl\":   { \"type\": \"string\", \"format\": \"uri\" },\n    \"timezone\":    { \"type\": \"string\", \"pattern\": \"^[A-Z][a-zA-Z_]+/[A-Z][a-zA-Z_]+$\" },\n    \"createdAt\":   { \"type\": \"string\", \"format\": \"date-time\" }\n  },\n  \"additionalProperties\": false\n}",
-          "ds":     "{\n  \"$schema\": \"https://json-schema.org/draft/2020-12/schema\",\n  \"title\":   \"UserProfile\",\n  \"type\":    \"object\",\n  \"required\": [\"id\", \"email\"],\n  \"properties\": {\n    \"id\":       { \"type\": \"string\" },\n    \"email\":    { \"type\": \"string\", \"format\": \"email\" },\n    \"name\":     { \"type\": \"string\" },\n    \"locale\":   { \"type\": \"string\", \"default\": \"en-US\" },\n    \"createdAt\":{ \"type\": \"string\", \"format\": \"date-time\" }\n  }\n}",
-          "llama":  "{\n  \"type\": \"object\",\n  \"required\": [\"id\", \"email\"],\n  \"properties\": {\n    \"id\":    { \"type\": \"string\" },\n    \"email\": { \"type\": \"string\", \"format\": \"email\" },\n    \"name\":  { \"type\": \"string\" },\n    \"createdAt\": { \"type\": \"string\", \"format\": \"date-time\" }\n  }\n}"
+          "ds": "{\n  \"$schema\": \"https://json-schema.org/draft/2020-12/schema\",\n  \"title\":   \"UserProfile\",\n  \"type\":    \"object\",\n  \"required\": [\"id\", \"email\"],\n  \"properties\": {\n    \"id\":       { \"type\": \"string\" },\n    \"email\":    { \"type\": \"string\", \"format\": \"email\" },\n    \"name\":     { \"type\": \"string\" },\n    \"locale\":   { \"type\": \"string\", \"default\": \"en-US\" },\n    \"createdAt\":{ \"type\": \"string\", \"format\": \"date-time\" }\n  }\n}",
+          "llama": "{\n  \"type\": \"object\",\n  \"required\": [\"id\", \"email\"],\n  \"properties\": {\n    \"id\":    { \"type\": \"string\" },\n    \"email\": { \"type\": \"string\", \"format\": \"email\" },\n    \"name\":  { \"type\": \"string\" },\n    \"createdAt\": { \"type\": \"string\", \"format\": \"date-time\" }\n  }\n}"
         }
       }
     }
@@ -1668,5 +2346,149 @@
         "us": "Zero Trust architectures, out-of-band verification (OOBV)"
       }
     ]
+  },
+  "talkFlowScripts": {
+    "01": {
+      "time": "1 min · ~120 words",
+      "opener": "I’m going to spend 20 minutes telling you what’s actually different about AI for our craft right now — not the hype, not the doom. Five concrete shifts, one live demo running on this laptop with no internet, and a $200 two-week experiment you can run on Monday. If by minute 20 you don’t have one thing you’re going to try this sprint, I’ve failed.",
+      "keyData": [
+        "METR randomized controlled trial (mid-2025): 16 experienced open-source devs · 246 tasks · their own repos. Result: −19% slower with AI; self-perceived +20% faster. 39-point perception gap.",
+        "Stack Overflow Developer Survey 2025: 84% of professional developers use AI in their workflow; 51% daily.",
+        "Industry quote frequently cited: ~42% of enterprise GenAI initiatives end up shelved or scaled back (commonly attributed to S&P/IBM-class surveys 2024–2025) — say ‘industry surveys put enterprise AI abandonment around 40%’ rather than a single hard number, then move on."
+      ],
+      "onStage": [
+        "Stand still. No slide. Look at the room for the first 10 seconds before you speak.",
+        "Lead with the contract: 20 minutes, 5 shifts, 1 demo, 1 experiment. Engineers respect tight scopes.",
+        "Cite METR by name and the −19% / +20% numbers. This is your skepticism credential.",
+        "Do NOT show the live demo yet. Foreshadow it (‘a real model running locally, no internet, in this browser tab’) and move on."
+      ],
+      "transition": "So if AI sometimes makes the best engineers slower, and 40% of enterprise pilots fail, what’s actually different in the last 12 months? Here are the five shifts that matter.",
+      "audienceRisk": "Hostile-audience opener. The room is waiting to dismiss you. Win them with credible skepticism in the first 60 seconds — don’t oversell."
+    },
+    "02": {
+      "time": "5 min · 1 min per shift",
+      "opener": "Five things didn’t exist 12 months ago. Not ‘GPT got better’ — five structurally different shifts. I’ll spend one minute on each, then we’ll go to the demo.",
+      "keyData": [
+        "Shift 1 · Agents: Cursor Composer edits 8 files in parallel · Devin in $25B funding talks · Qwen 3.7 Max ran 35h autonomously with 1,000+ tool calls.",
+        "Shift 2 · Price collapse: GPT-4 (2023) $30/$60 per Mtok → DeepSeek V4 Flash (2026) $0.14/$0.28. That’s ~200× on the cheap end. Prompt caching adds 40–70% on top.",
+        "Shift 3 · Reasoning knob: o1 (Sep 2024) → DeepSeek-R1 (Jan 2025) → standard across all frontier labs by 2026. Claude Mythos leads SWE-Bench Verified at 93.9%.",
+        "Shift 4 · MCP: 54,450 servers indexed (May 2026). AWS Bedrock AgentCore exposes MCP natively. Microsoft, Salesforce, Anthropic, OpenAI all wrote first-class support.",
+        "Shift 5 · Open weights: Kimi K2.6 ties GPT-5.5 on SWE-Bench Pro under Modified MIT. DeepSeek V4 1.6T MoE. The frontier gap effectively closed."
+      ],
+      "onStage": [
+        "Strict 60 seconds per shift. Use the timer on the laptop visible to you.",
+        "Don’t read the cards — the audience is reading them on the talk page link they have. You add the verbal hook (‘the say-it-like-this line’) and one number.",
+        "Skip the bullets. Land the implication of each shift, not the evidence list.",
+        "If you’re behind on time, drop the evidence and keep the implication. The implication is the load-bearing claim."
+      ],
+      "transition": "These are the claims. Now the proof — let’s switch to the demo tab. The model you’re about to see is running 100% in this browser with no network, no API keys.",
+      "audienceRisk": "Engineers will pattern-match to the labs they already follow. Don’t argue ‘OpenAI vs Anthropic vs DeepSeek’ — keep it about the architectural shift, not the leaderboard."
+    },
+    "03": {
+      "time": "8 min · the heart of the talk",
+      "opener": "This laptop. No internet. Watch. Click the talk-page link to live-demo.html. Open DevTools → Network → ‘Offline’. Run anything.",
+      "keyData": [
+        "WebGPU runs the model on the audience’s GPU — Apple M-series, RTX, Intel Arc — first-token latency is real, not animated.",
+        "Tab 1 (Chat): point at the tok/s readout. ‘Each one of those numbers is a real forward pass, not a recording.’",
+        "Tab 2 (Reasoning Knob): same prompt, three system prompts. Tokens out and time go up; quality goes up. Cost knob made visible.",
+        "Tab 3 (Persona): same model, same prompt; system prompt changes everything. ‘The behaviour you see in production is mostly the system prompt.’",
+        "Tab 4 (Tools): model emits JSON · browser executes · result fed back. ‘This is the agent loop, end to end, 80 lines of vanilla JavaScript.’",
+        "Tab 5 (Orchestration): one model, four roles, sequential calls. ‘This is how Claude Code, Devin, Cursor Composer work — minus a thousand engineering details.’"
+      ],
+      "onStage": [
+        "Don’t pre-load the model in front of the audience. Pre-warm it before the talk so weights are cached.",
+        "If WebGPU is unavailable on stage hardware, switch to Qwen 0.5B (CPU-friendly) and say so out loud.",
+        "Encourage the room to open the URL on their laptops — when 30 people are seeing real tok/s on their own machines, the talk has already won.",
+        "Resist the urge to narrate every token. Let silence do the work for the first 10 seconds of streaming.",
+        "If the model says something weird, lean into it: ‘This is a 1B-param model. The frontier is 1T. The shift is that this works at all.’"
+      ],
+      "transition": "Same model, five lenses. Now: what should you actually learn this year?",
+      "audienceRisk": "Demo failure modes: WiFi drops mid-download (mitigation: pre-cache); model loads slowly (mitigation: smallest model first); audience laptops can’t run WebGPU (mitigation: don’t make them run it — your screen is enough)."
+    },
+    "04": {
+      "time": "3 min · ~30s per discipline",
+      "opener": "Four skills appreciated fastest in 2026. None of them are ‘write better prompts.’",
+      "keyData": [
+        "D1 · Eval Engineering: Promptfoo, Inspect AI, Braintrust, Langfuse, Helicone all production-grade. Treat AI features like any other prod code — golden datasets, regression on every deploy.",
+        "D2 · Spec-Driven Development: Thoughtworks, Martin Fowler, GitHub, Amazon, and a 67-source academic review (arXiv 2411.13768) all converged on this in 2025–2026.",
+        "D3 · Cost Engineering: prefix caching pins prompts at ~10% of input rate. Anthropic, OpenAI, Google all support it. 40–70% reduction with zero code changes.",
+        "D4 · Agent Orchestration & Observability: debugging an agent that calls 300 tools needs OpenTelemetry traces, not console.log. LangGraph, CrewAI, AutoGen, Claude Agent SDK."
+      ],
+      "onStage": [
+        "One sentence per discipline. The room doesn’t need a tool catalogue — they need to know the names so they can search later.",
+        "Land the framing: ‘the unit of work moved from typing functions to writing specs, designing evals, reviewing diffs from agents.’",
+        "Optional callback: ‘That tool-calling demo three minutes ago was eval-able the moment you wrote it. The agent loop, the JSON schema, the ground-truth answers — that’s the spec.’"
+      ],
+      "transition": "But this isn’t a victory lap. Here’s where it actually breaks.",
+      "audienceRisk": "Skip the temptation to teach any one of these. You’re naming, not training. If you teach, you blow the time budget."
+    },
+    "05": {
+      "time": "3 min · the credibility tax",
+      "opener": "If I only told you the bullish parts, you’d have stopped listening. Four uncomfortable findings.",
+      "keyData": [
+        "AI can make you slower (METR mid-2025): 16 experienced devs, 246 tasks, on their own repos. −19% with AI, +20% perception. Repeat the 39-point gap.",
+        "The slop problem (DORA 2025): ‘we got faster at producing change; we did not get equally fast at understanding its consequences.’ Code review is the new bottleneck. AI amplifies the org you already have.",
+        "Junior skill atrophy: when the agent always writes the code, when do juniors learn to read it? The skill appreciating fastest is also the one eroding fastest among new hires.",
+        "Cost surprises: a single high-effort reasoning query can emit 50K+ output tokens. At GPT-5.5 rates that’s ~$1.50 per call. Budget for output, not input."
+      ],
+      "onStage": [
+        "Slow down here. The previous beats were claims — these are caveats. Pace shift signals seriousness.",
+        "If you’re behind, keep METR + DORA and drop juniors + cost. Those two are the ones engineers fact-check after the talk.",
+        "Don’t editorialise. Engineers prefer ‘DORA found X’ over ‘I think X.’"
+      ],
+      "transition": "So what do you do about it on Monday morning?",
+      "audienceRisk": "This is when someone asks ‘Will AI replace us?’ Have the answer ready (Q1 in the Q&A list). Don’t ad-lib it."
+    },
+    "06": {
+      "time": "2 min · close strong",
+      "opener": "Three experiments. $200/engineer. Two weeks. Schedule the retro before you start.",
+      "keyData": [
+        "Week 1A · Replace your editor: Cursor or Claude Code as primary on one real feature. Track time-to-PR, diff size, your review burden.",
+        "Week 1B · Stand up an MCP server: pick one internal tool — wiki, ticketing, monitoring. Wrap it. Connect your IDE. Measure tool-use rate.",
+        "Week 2 · Write evals for one feature: 50-example golden dataset · LLM-as-Judge graders · run on the next deploy. Promptfoo or Inspect AI.",
+        "Pre-approve the budget with finance / your VP before the talk. The CTA lands flat without a real budget."
+      ],
+      "onStage": [
+        "End on the closing line — memorise it: ‘AI didn’t replace engineers — it changed the unit of work. We’re not typing functions anymore, we’re writing specs, designing evals, and reviewing diffs from agents. That’s still software engineering. It just looks different.’",
+        "Concrete CTA: pick one of the three, give it two weeks, send the team a 1-paragraph retro. Don’t leave the next step ambiguous.",
+        "Don’t take questions in the closing minute. Land the line, hold the silence, then open Q&A."
+      ],
+      "transition": "Two weeks. One experiment. Tell me what you found. Questions?",
+      "audienceRisk": "Don’t run over. A 20-minute talk that lands on time earns the trust to deliver the next one. A 23-minute talk loses the room in the last three."
+    }
+  },
+  "talkSayIt": {
+    "Shift 01": "Twelve months ago: tab completion. Today: ‘ship a PR, here are the tests, ping me.’ Different muscle.",
+    "Shift 02": "Inference is 30 to 200× cheaper than 24 months ago. Patterns we called demos last year are in production this year.",
+    "Shift 03": "Reasoning_effort is now a knob. You stop prompt-engineering harder and start writing better specs.",
+    "Shift 04": "MCP is to AI integration what HTTP was to networking — the boring standard that makes the whole stack possible.",
+    "Shift 05": "The frontier gap closed. Open weights are no longer the cheap-and-slow tier — they’re the cheap-and-good tier."
+  },
+  "talkShiftScripts": {
+    "Shift 01": {
+      "anchor": "Devin runs in $25B funding talks. Cursor Composer edits 8 files in parallel. Qwen 3.7 Max ran 35 hours autonomously with 1,000+ tool calls. The work-unit changed.",
+      "objection": "‘But agents hallucinate / fabricate / break stuff.’",
+      "counter": "Yes — and so do junior engineers. The discipline is code review, not refusal. The eval-and-review muscle is the new senior-engineer skill."
+    },
+    "Shift 02": {
+      "anchor": "GPT-4 was $30/$60 per million tokens in 2023. DeepSeek V4 Flash is $0.14/$0.28 in 2026. That’s roughly 200× cheaper on the floor. Then prompt caching shaves another 40–70%.",
+      "objection": "‘Reasoning models burn through tokens — won’t this blow up costs anyway?’",
+      "counter": "Right — that’s why output budgeting and model routing are now real disciplines. The unit cost dropped; the per-call ceiling went up. You manage both."
+    },
+    "Shift 03": {
+      "anchor": "OpenAI o1 in September 2024. DeepSeek-R1 in January 2025. By 2026, every frontier lab ships a reasoning_effort knob. Claude Mythos leads SWE-Bench Verified at 93.9% by deliberation — not by knowing more.",
+      "objection": "‘Isn’t this just a glorified system prompt?’",
+      "counter": "The model is RL-trained to emit chain-of-thought tokens before the answer. Quality scales with thinking budget. You’ll see this live in the demo’s reasoning-knob tab."
+    },
+    "Shift 04": {
+      "anchor": "54,450 MCP servers indexed in May 2026. AWS Bedrock AgentCore exposes MCP natively. Microsoft, Salesforce, Anthropic, and OpenAI all wrote first-class support inside one year. That’s protocol-level adoption speed.",
+      "objection": "‘Yet another standard. Why not just call our APIs?’",
+      "counter": "Because your IDE — Cursor, Claude Code, Codex CLI — already speaks MCP. One config block exposes your wiki, ticketing, observability to every agent on every dev’s machine. That’s the win."
+    },
+    "Shift 05": {
+      "anchor": "Kimi K2.6 ties GPT-5.5 on SWE-Bench Pro under a Modified MIT licence. DeepSeek V4 is 1.6T parameters MoE. GLM-5.1 is 754B. The frontier closed — open weights aren’t the cheap-and-slow tier anymore, they’re the cheap-and-good tier.",
+      "objection": "‘We can’t run a 1T-parameter MoE in our VPC.’",
+      "counter": "You don’t have to run the biggest one. Kimi K2.6 active params are 32B — that fits on one H100. The point is: the option exists. ‘Compliance says no’ is no longer a reason to skip the best AI."
+    }
   }
 }
